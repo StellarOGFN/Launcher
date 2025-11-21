@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+
+    <style>
+        body {
+            background: #000;
+            margin: 0;
+            padding: 40px;
+            font-family: system-ui, sans-serif;
+            color: #fff;
+        }
+        
+        h1 {
+            text-align: center;
+            margin-bottom: 40px;
+            font-weight: 600;
+            letter-spacing: -0.5px;
+            opacity: 0.9;
+        }
+        
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 30px;
+        }
+        
+        .panel {
+            height: 260px;
+            border-radius: 22px;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .panel img {
+            width: 110px;
+            height: auto;
+            filter: drop-shadow(0 0 30px rgba(255, 255, 255, 0.25));
+        }
+        
+        .g1 {
+            background: linear-gradient(135deg, #0b0b12, #1a1a24);
+        }
+        
+        .g2 {
+            background: linear-gradient(135deg, #0a0f18, #182032);
+        }
+        
+        .g3 {
+            background: linear-gradient(135deg, #0d0e1a, #2a2844);
+        }
+        
+        .g4 {
+            background: linear-gradient(135deg, #070a12, #101830);
+        }
+        
+        .g5 {
+            background: linear-gradient(135deg, #0a0a14, #1f1b33);
+        }
+        
+        .g6 {
+            background: linear-gradient(135deg, #0a0a10, #191929);
+        }
+        
+        .g7 {
+            background: linear-gradient(135deg, #0a0c12, #181a2e);
+        }
+        
+        .g8 {
+            background: linear-gradient(135deg, #0a0a12, #292c48);
+        }
+        
+        .g9 {
+            background: linear-gradient(135deg, #080810, #303050);
+        }
+        
+        .g10 {
+            background: linear-gradient(135deg, #0a0a14, #24243a);
+        }
+        
+        .g11 {
+            background: linear-gradient(135deg, #090a10, #1a1e2f);
+        }
+        
+        .g12 {
+            background: linear-gradient(135deg, #0a0a16, #2a2a3f);
+        }
+        
+        .g13 {
+            background: linear-gradient(135deg, #08090f, #2e3350);
+        }
+        
+        .g14 {
+            background: linear-gradient(135deg, #0a0a12, #262b3f);
+        }
+        
+        .g15 {
+            background: linear-gradient(135deg, #080b12, #323860);
+        }
+        
+        .g16 {
+            background: linear-gradient(135deg, #02010a, #1a0676);
+        }
+        
+        .g17 {
+            background: linear-gradient(135deg, #030018, #3a0ca3);
+        }
+        
+        .g18 {
+            background: linear-gradient(135deg, #000319, #261b56);
+        }
+        
+        .g19 {
+            background: linear-gradient(135deg, #01010f, #003f8f);
+        }
+        
+        .g20 {
+            background: linear-gradient(135deg, #000418, #47008f);
+        }
+        
+        .g21 {
+            background: linear-gradient(135deg, #01020a, #2d0080);
+        }
+        
+        .g22 {
+            background: linear-gradient(135deg, #020214, #4a00c4);
+        }
+        
+        .g23 {
+            background: linear-gradient(135deg, #000312, #2d2380);
+        }
+        
+        .g24 {
+            background: linear-gradient(135deg, #010111, #2b3bcf);
+        }
+        
+        .g25 {
+            background: linear-gradient(135deg, #010012, #38068f);
+        }
+        
+        .g26 {
+            background: linear-gradient(135deg, #020014, #6236cf);
+        }
+        
+        .g27 {
+            background: linear-gradient(135deg, #010014, #002964);
+        }
+        
+        .g28 {
+            background: linear-gradient(135deg, #000014, #4e0096);
+        }
+        
+        .g29 {
+            background: linear-gradient(135deg, #0a0014, #7600ff);
+        }
+        
+        .g30 {
+            background: linear-gradient(135deg, #000412, #1f1fab);
+        }
+        
+        .g31 {
+            background: linear-gradient(135deg, #02030a, #05154f, #001bff);
+        }
+        
+        .g32 {
+            background: linear-gradient(135deg, #05010a, #28004d, #a000ff);
+        }
+        
+        .g33 {
+            background: linear-gradient(135deg, #02000b, #001020, #00c6ff);
+        }
+        
+        .g34 {
+            background: linear-gradient(135deg, #01000a, #220027, #ff00e1);
+        }
+        
+        .g35 {
+            background: linear-gradient(135deg, #01040a, #002142, #008cff);
+        }
+        
+        .g36 {
+            background: linear-gradient(135deg, #010311, #0045ff, #3100ff);
+        }
+        
+        .g37 {
+            background: linear-gradient(135deg, #020012, #3a008e, #a000f8);
+        }
+        
+        .g38 {
+            background: linear-gradient(135deg, #01020f, #002470, #00c4ff);
+        }
+        
+        .g39 {
+            background: linear-gradient(135deg, #02020f, #13003f, #ff32f7);
+        }
+        
+        .g40 {
+            background: linear-gradient(135deg, #01030c, #003084, #26e0ff);
+        }
+        
+        .g41 {
+            background: linear-gradient(135deg, #01000d, #440077, #ff00f2);
+        }
+        
+        .g42 {
+            background: linear-gradient(135deg, #020112, #002255, #00afff);
+        }
+        
+        .g43 {
+            background: linear-gradient(135deg, #020015, #3d0068, #c800ff);
+        }
+        
+        .g44 {
+            background: linear-gradient(135deg, #000015, #00116f, #2098ff);
+        }
+        
+        .g45 {
+            background: linear-gradient(135deg, #01000e, #28005a, #ff26d2);
+        }
+        
+        .g46 {
+            background: linear-gradient(135deg, #050012, #17003e, #3d0099);
+        }
+        
+        .g47 {
+            background: linear-gradient(135deg, #060013, #0f0031, #6222a5);
+        }
+        
+        .g48 {
+            background: linear-gradient(135deg, #080014, #18003d, #4a00d4);
+        }
+        
+        .g49 {
+            background: linear-gradient(135deg, #040018, #1a003a, #2a2aff);
+        }
+        
+        .g50 {
+            background: linear-gradient(135deg, #02000e, #15003a, #8f3af8);
+        }
+        
+        .g51 {
+            background: linear-gradient(135deg, #080012, #260044, #5500be);
+        }
+        
+        .g52 {
+            background: linear-gradient(135deg, #050014, #200050, #8033ff);
+        }
+        
+        .g53 {
+            background: linear-gradient(135deg, #060018, #1e0050, #6a40ff);
+        }
+        
+        .g54 {
+            background: linear-gradient(135deg, #04001a, #240058, #4a3fff);
+        }
+        
+        .g55 {
+            background: linear-gradient(135deg, #02001a, #1c0064, #aa55ff);
+        }
+        
+        .g56 {
+            background: linear-gradient(135deg, #040016, #2a005c, #8844ff);
+        }
+        
+        .g57 {
+            background: linear-gradient(135deg, #060017, #340070, #992dff);
+        }
+        
+        .g58 {
+            background: linear-gradient(135deg, #050015, #240073, #5e2bff);
+        }
+        
+        .g59 {
+            background: linear-gradient(135deg, #030018, #1e0068, #332bff);
+        }
+        
+        .g60 {
+            background: linear-gradient(135deg, #050015, #28007a, #d060ff);
+        }
+    </style>
+</head>
+
+<body>
+    <div class="grid">
+        <script>
+            for (let i = 1; i <= 60; i++) {
+                document.write(
+                    `<div class="panel g${i}">
+                    <img src="public/StellarStar.png">
+                 </div>`
+                );
+            }
+        </script>
+    </div>
+</body>
+
+</html>
