@@ -3,6 +3,7 @@ import { HashRouter, Route, Routes, useLocation } from "react-router-dom";
 import Particles from "./components/Core/Particles";
 import Frame from "./components/Core/Frame";
 import "./index.css";
+import Login from "./pages/Login";
 
 const root = ReactDOM.createRoot(
   document.getElementById("root") as HTMLElement
@@ -14,7 +15,9 @@ const App = () => {
       <Frame />
       <Particles quantity={70} />
 
-      <Routes></Routes>
+      <Routes>
+        <Route path="/" element={<Login />} />
+      </Routes>
     </>
   );
 };
