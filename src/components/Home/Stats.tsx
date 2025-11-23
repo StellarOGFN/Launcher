@@ -11,7 +11,7 @@ const Stats: React.FC = () => {
   const stats: UserStats = {
     kills: 55,
     wins: 23,
-    playtime: "kys",
+    playtime: "12h 34m",
   };
 
   return (

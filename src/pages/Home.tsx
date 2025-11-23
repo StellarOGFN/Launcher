@@ -11,7 +11,7 @@ const getGreeting = (): string => {
   } else if (hour >= 12 && hour < 18) {
     return "Good afternoon";
   } else {
-    return "Good night";
+    return "Evening";
   }
 };
 
@@ -31,12 +31,14 @@ const Home: React.FC = () => {
       <div className="w-full flex flex-col gap-5 py-5 z-10 h-full">
         <div>
           <h2 className="text-xl font-normal flex flex-row gap-1.5 text-white">
-            {greeting}, <p className="font-bold text-[#274799]">faggot!</p>
+            {greeting}, <p className="font-bold text-[#274799]">andr1ww!</p>
           </h2>
           <p className="text-white font-normal text-sm">0 Players Online</p>
         </div>
         <Banner />
-        <Stats />
+        <div className="w-full flex justify-end">
+          <Stats />
+        </div>
       </div>
     </motion.div>
   );
