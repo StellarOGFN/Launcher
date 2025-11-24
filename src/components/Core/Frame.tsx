@@ -6,7 +6,7 @@ const Frame: React.FC = () => {
   return (
     <div
       data-tauri-drag-region
-      className="fixed w-screen h-9 top-0 left-0 flex justify-end items-center z-50"
+      className="fixed w-screen h-7 top-0 left-0 flex justify-end items-center z-50"
     >
       <div className="flex items-center ml-3 mt-1"></div>
       <div className="flex text-white h-full">

@@ -27,7 +27,7 @@ const Home: React.FC = () => {
         type: "tween",
         duration: 0.3,
       }}
-      className="w-[calc(100vw-64px)] ml-16 h-screen flex flex-col px-7 pt-7 justify-start items-start"
+      className="w-[calc(100vw-64px)] ml-16 h-screen flex flex-col px-7 pt-5 justify-start items-start"
     >
       <div className="w-full flex flex-col gap-5 py-5 z-10 h-full">
         <div>
