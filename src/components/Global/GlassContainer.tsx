@@ -4,12 +4,14 @@ interface GlassProps {
   children: React.ReactNode;
   className?: string;
   onClick?: () => void;
+  style?: React.CSSProperties;
 }
 
 const GlassContainer: React.FC<GlassProps> = ({
   children,
   className = "",
   onClick,
+  style,
 }) => {
   return (
     <div
@@ -17,6 +19,7 @@ const GlassContainer: React.FC<GlassProps> = ({
          backdrop-saturate-100 backdrop-contrast-100
         shadow-xl border border-white/20 ${className}`}
       onClick={onClick}
+      style={style}
     >
       {children}
     </div>

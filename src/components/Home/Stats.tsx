@@ -19,9 +19,6 @@ const Stats: React.FC = () => {
       <h2 className="text-xl font-bold tracking-wide mb-3">STATS</h2>
 
       <div>
-        <h3 className="uppercase text-sm tracking-wide opacity-70">All Time</h3>
-        <div className="h-[2px] w-full bg-white/10 mt-1 mb-2" />
-
         <div className="flex flex-col gap-2">
           <p className="font-normal flex flex-row justify-between items-center gap-2 opacity-90">
             Kills:
