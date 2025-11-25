@@ -6,3 +6,6 @@
 ![TypeScript](https://img.shields.io/badge/typescript-%23007ACC.svg?style=for-the-badge&logo=typescript&logoColor=white)
 ![Tailwind](https://img.shields.io/badge/tailwindcss-%2338BDF8.svg?style=for-the-badge&logo=tailwindcss&logoColor=white)
 ![Bun](https://img.shields.io/badge/bun-%23000000.svg?style=for-the-badge&logo=bun&logoColor=white)
+
+
+Stellar launcher by: luc(the one who made most of thte launcher), tiva (did a lil bit ig.), abstract (zero commits), avxge (no comment)
