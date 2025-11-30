@@ -105,8 +105,8 @@ const Sidebar: React.FC = () => {
           className={`${baseButton} ${hoverButton} overflow-visible relative`}
         >
           <img
-            src="https://cdn.discordapp.com/avatars/903815911830589462/843e986f0a518b1b7eab8f17424241ae.png?size=512"
-            alt="Profile"
+            src="https://cdn.discordapp.com/avatars/903815911830589462/a_0eb9ae578f957c358faa1c7f449dbecd.gif?size=512"
+            alt="avatar"
             className="w-8 h-8 rounded-md object-cover"
             draggable={false}
           />
@@ -141,49 +141,57 @@ const Sidebar: React.FC = () => {
                 animate={{ opacity: 1, x: 0, scale: 1 }}
                 exit={{ opacity: 0, x: -10, scale: 0.95 }}
                 transition={{ duration: 0.15 }}
-                className="absolute left-14 bottom-0"
+                className="absolute left-14 bottom-0 z-10 bg-gray-500/5 bg-clip-padding backdrop-filter backdrop-blur-lg
+         backdrop-saturate-100 backdrop-contrast-100
+        shadow-xl"
               >
-                <GlassContainer className="w-44 rounded-md bg-glass-noise overflow-hidden">
-                  <div className="p-2.5 px-3 border-b border-white/10">
-                    <div className="flex items-center gap-2.5">
-                      <img
-                        src="https://cdn.discordapp.com/avatars/903815911830589462/843e986f0a518b1b7eab8f17424241ae.png?size=512"
-                        alt="Profile"
-                        className="w-8 h-8 rounded-lg object-cover"
-                        draggable={false}
-                      />
-                      <div className="flex flex-col">
-                        <h3 className="font-medium text-white text-sm">
-                          andr1ww
-                        </h3>
+                <div className="liquid-glass w-44 bg-glass-noise rounded-md overflow-hidden border border-white/20">
+                  <div className="glass-effect"></div>
+                  <div className="glass-tint"></div>
+                  <div className="glass-shine"></div>
+
+                  <div className="glass-content">
+                    <div className="p-2.5 px-3 border-b border-white/10">
+                      <div className="flex items-center gap-2.5">
+                        <img
+                          src="https://cdn.discordapp.com/avatars/903815911830589462/a_0eb9ae578f957c358faa1c7f449dbecd.gif?size=512"
+                          alt="avatar"
+                          className="w-8 h-8 rounded-lg object-cover"
+                          draggable={false}
+                        />
+                        <div className="flex flex-col">
+                          <h3 className="font-medium text-white text-sm">
+                            andr1ww
+                          </h3>
+                        </div>
                       </div>
                     </div>
-                  </div>
 
-                  <div className="p-1.5 flex flex-col gap-1.5">
-                    <button
-                      onClick={() => {
-                        setShowProfileMenu(false);
-                        navigate("/settings");
-                      }}
-                      className="w-full flex items-center gap-2.5 px-2.5 py-2 text-white/80 hover:bg-white/10 rounded-md transition-all duration-200 group"
-                    >
-                      <TbSettings className="w-3.5 h-3.5 text-gray-400 group-hover:text-white transition-colors" />
-                      <span className="text-xs">Settings</span>
-                    </button>
+                    <div className="p-1.5 flex flex-col gap-1.5">
+                      <button
+                        onClick={() => {
+                          setShowProfileMenu(false);
+                          navigate("/settings");
+                        }}
+                        className="w-full flex items-center gap-2.5 px-2.5 py-2 text-white/80 hover:bg-white/10 rounded-md transition-all duration-200 group"
+                      >
+                        <TbSettings className="w-3.5 h-3.5 text-gray-400 group-hover:text-white transition-colors" />
+                        <span className="text-xs">Settings</span>
+                      </button>
 
-                    <button
-                      onClick={() => {
-                        setShowProfileMenu(false);
-                        navigate("/");
-                      }}
-                      className="w-full flex items-center gap-2.5 px-2.5 py-2 text-red-400 hover:bg-red-500/10 rounded-md transition-all duration-200 group"
-                    >
-                      <TbLogout className="w-3.5 h-3.5 text-red-400 group-hover:text-red-300 transition-colors" />
-                      <span className="text-xs">Logout</span>
-                    </button>
+                      <button
+                        onClick={() => {
+                          setShowProfileMenu(false);
+                          navigate("/");
+                        }}
+                        className="w-full flex items-center gap-2.5 px-2.5 py-2 text-red-400 hover:bg-red-500/10 rounded-md transition-all duration-200 group"
+                      >
+                        <TbLogout className="w-3.5 h-3.5 text-red-400 group-hover:text-red-300 transition-colors" />
+                        <span className="text-xs">Logout</span>
+                      </button>
+                    </div>
                   </div>
-                </GlassContainer>
+                </div>
               </motion.div>
             </>
           )}
