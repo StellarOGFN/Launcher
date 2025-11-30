@@ -141,7 +141,9 @@ const Sidebar: React.FC = () => {
                 animate={{ opacity: 1, x: 0, scale: 1 }}
                 exit={{ opacity: 0, x: -10, scale: 0.95 }}
                 transition={{ duration: 0.15 }}
-                className="absolute left-14 bottom-0 z-10"
+                className="absolute left-14 bottom-0 z-10 bg-gray-500/5 bg-clip-padding backdrop-filter backdrop-blur-lg
+         backdrop-saturate-100 backdrop-contrast-100
+        shadow-xl"
               >
                 <div className="liquid-glass w-44 bg-glass-noise rounded-md overflow-hidden border border-white/20">
                   <div className="glass-effect"></div>

@@ -36,11 +36,16 @@ export default {
         ".glass-effect": {
           position: "absolute",
           inset: "0",
-          zIndex: "1",
-          backdropFilter: "blur(8px)",
+          zIndex: "1", // idk why i had to do important?
+          backdropFilter: "blur(80px) saturate(200%) !important",
+          WebkitBackdropFilter: "blur(80px) saturate(200%) !important",
+
+          backgroundColor: "rgba(0,0,0,0.01)",
+
           filter: "url(#glass-distortion)",
           isolation: "isolate",
         },
+
         ".glass-tint": {
           position: "absolute",
           inset: "0",
