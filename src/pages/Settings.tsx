@@ -31,20 +31,20 @@ const Settings: React.FC = () => {
       initial={{ scale: 0.9, opacity: 0 }}
       animate={{ scale: 1, opacity: 1 }}
       transition={{ type: "tween", duration: 0.3 }}
-      className="w-[calc(100vw-64px)] ml-16 h-screen flex flex-col gap-2 px-5 py-5"
+      className="w-[calc(100vw-64px)] ml-16 h-screen flex flex-col items-center px-5 py-8"
     >
-      <div className="pt-4">
+      <div className="w-full max-w-5xl mb-6">
         <SettingsTopBar onSelect={(v) => setView(v)} />
       </div>
 
       <motion.div
         key={view}
-        initial={{ opacity: 0, x: 10 }}
-        animate={{ opacity: 1, x: 0 }}
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.2 }}
-        className="flex-1 p-4"
+        className="w-full max-w-5xl flex-1"
       >
-        <GlassContainer className="p-4 rounded-xl">
+        <GlassContainer className="p-8 rounded-xl h-full">
           {renderView()}
         </GlassContainer>
       </motion.div>
