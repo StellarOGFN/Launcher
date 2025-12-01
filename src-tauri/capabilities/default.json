@@ -16,6 +16,8 @@
     "core:window:allow-unmaximize",
     "core:webview:allow-create-webview-window",
     "opener:allow-default-urls",
-    "dialog:default"
+    "dialog:default",
+    "http:default",
+    "shell:default"
   ]
 }

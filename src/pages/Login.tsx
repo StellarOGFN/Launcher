@@ -4,11 +4,11 @@ import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { ArrowRight } from "lucide-react";
 import GlassContainer from "../components/Global/GlassContainer";
-import { useNavigate } from "react-router-dom";
+import { Stellar } from "@/stellar/Requests";
+import { open } from "@tauri-apps/plugin-shell";
 
 const Login: React.FC = () => {
   const [showWelcome, setShowWelcome] = useState(true);
-  const nav = useNavigate();
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -16,6 +16,18 @@ const Login: React.FC = () => {
     }, 2400);
     return () => clearTimeout(timer);
   }, []);
+
+  const handleClick = async () => {
+    Stellar.Requests.get<{ url: string }>(
+      "https://prod-api-v1.stellarfn.dev/stellar/launcher/data?type=auth"
+    ).then((res) => {
+      if (res.ok) {
+        open(res.data.url);
+      } else {
+        console.error("failed to get auth URL:", res.status);
+      }
+    });
+  };
 
   return (
     <div className="relative flex items-center justify-center min-h-screen overflow-hidden">
@@ -79,7 +91,7 @@ const Login: React.FC = () => {
           </div>
 
           <button
-            onClick={async () => await nav("/home")}
+            onClick={handleClick}
             className="group/button bg-glass-noise relative min-w-[375px] inline-flex items-center overflow-hidden rounded-md bg-blue-800/30 backdrop-blur-lg px-12 py-3 justify-center gap-2 text-base font-semibold text-white transition-all duration-300 ease-in-out hover:scale-[1.02] hover:shadow-xl hover:shadow-gray-600/10 border border-white/20"
           >
             <span>Continue</span>
