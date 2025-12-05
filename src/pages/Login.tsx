@@ -18,7 +18,7 @@ const Login: React.FC = () => {
 
   useEffect(() => {
     (async () => {
-      await Routing.initRouting(["auth", "public", "account"]);
+      await Routing.initRouting(["auth", "public", "account", "oauth"]);
       AuthStore.init();
     })();
 

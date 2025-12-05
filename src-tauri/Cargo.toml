@@ -28,7 +28,15 @@ tauri-plugin-shell = "2"
 tauri-plugin-deep-link = "2"
 tauri-plugin-log = "2"
 tauri-plugin-notification = "2"
-
+dirs = "5.0"
+tokio = { version = "=1.32.0", features = ["full"] }
+regex = "1"
+flate2 = "1.0.25"
+indicatif = "0.17.3"
+futures-util = "0.3"
+reqwest = { version = "0.12.22", features = ["stream", "blocking", "json"] }
+winapi = { version = "0.3", features = ["tlhelp32", "shellapi", "winbase", "memoryapi", "handleapi"] }
+windows = { version = "0.58", features = ["Win32_UI_Shell"] }
 [target.'cfg(not(any(target_os = "android", target_os = "ios")))'.dependencies]
 tauri-plugin-single-instance = { version = "2.0.0", features = ["deep-link"] }
 

@@ -1,5 +1,7 @@
+import { Stellar } from "@/stellar";
 import { useAuthStore } from "@/zustand/AuthStore";
 import BuildStore, { IBuild } from "@/zustand/BuildStore";
+import { useRoutingStore } from "@/zustand/RoutingStore";
 import { window } from "@tauri-apps/api";
 import { invoke } from "@tauri-apps/api/core";
 import { join } from "@tauri-apps/api/path";
@@ -57,9 +59,29 @@ export const handlePlay = async (selectedPath: string) => {
             sound: "ms-winsoundevent:Notification.Default",
         });
 
-        window.getCurrentWindow().minimize();
+        const Routing = useRoutingStore.getState();
+        const r = Routing.Routes.get("oauth");
+        let result = false;
 
-        return true;
+        await Stellar.Requests.get<{
+            code: string;
+        }>((r?.url ?? "") + "/exchange", {
+            Authorization: `bearer ${access_token}`,
+        }).then(async (res) => {
+            if (res.ok) {
+                result = true;
+                await invoke("launch", {
+                    code: res.data.code,
+                    path: path,
+                });
+
+                window.getCurrentWindow().minimize();
+            } else {
+                console.log(res.data);
+            }
+        });
+
+        return result;
     } catch (error) {
         console.error(`error launching ${build.version}:`, error);
         sendNotification({
