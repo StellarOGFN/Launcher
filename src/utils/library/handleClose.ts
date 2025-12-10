@@ -4,6 +4,8 @@ import { join } from "@tauri-apps/api/path";
 import { sendNotification } from "@tauri-apps/plugin-notification";
 
 export const handleClose = async (selectedPath: string) => {
+  await invoke("exit_all", {});
+
   const buildstate = BuildStore.getState();
 
   const exe = await join(
@@ -38,7 +40,6 @@ export const handleClose = async (selectedPath: string) => {
 
   try {
     build.open = false;
-    await invoke("exit_all", {});
   } catch (error) {
     console.error(`error launching ${build.version}:`, error);
     sendNotification({

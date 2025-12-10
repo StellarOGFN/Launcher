@@ -72,7 +72,8 @@ const BuildCard: React.FC<{
 
         <div className="absolute right-2 bottom-2 flex flex-col gap-1 items-center z-50">
           <button
-            onClick={() => {
+            onClick={(e) => {
+              e.stopPropagation();
               if (build.open) return onClose(path);
               if (!build.loading) return onPlay(path);
             }}
@@ -88,7 +89,10 @@ const BuildCard: React.FC<{
           </button>
 
           <button
-            onClick={() => onDelete(path)}
+            onClick={(e) => {
+              e.stopPropagation();
+              onDelete(path);
+            }}
             className="flex items-center justify-center text-white/55 p-2 rounded-md border border-white/25 hover:text-white/80 translate-x-10 group-hover:translate-x-0 hover:border-white/50 transition duration-200 bg-gray-500/5 backdrop-blur-sm shadow-sm"
           >
             <MdDeleteForever className="w-3 h-3" />
