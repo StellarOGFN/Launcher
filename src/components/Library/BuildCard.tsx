@@ -30,7 +30,6 @@ const BuildCard: React.FC<{
     <GlassContainer
       onClick={() => {
         // some ppl could get confused cuz the play button is there after hover so
-        if (build.open) return onClose(path);
         if (!build.loading) return onPlay(path);
       }}
       className="relative w-full h-[260px] 2xl:h-[320px] rounded-md border border-white/25 bg-gradient-to-t from-black/40 to-transparent overflow-hidden shadow-lg group"
