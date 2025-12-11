@@ -92,7 +92,13 @@ const Banner: React.FC = () => {
             </button>
             <div className="flex items-center gap-2">
               {LaunchPosts.map((_, index) => (
-                <button key={index} className="relative">
+                <button
+                  key={index}
+                  onClick={() => {
+                    useBannerStore.getState().setPostIndex(index);
+                  }}
+                  className="relative"
+                >
                   <div
                     className={`h-1 rounded-full transition-all duration-500 ${
                       index === PostIndex ? "w-8 bg-white" : "w-4 bg-white/30"
