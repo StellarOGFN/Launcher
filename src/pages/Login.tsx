@@ -70,7 +70,7 @@ const Login: React.FC = () => {
       setShowWelcome(false);
     }, 2400);
     return () => clearTimeout(timer);
-  }, []);
+  }, [isLoggedIn]);
 
   const handleClick = () => {
     const authRoute = Routing.Routes.get("auth");

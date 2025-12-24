@@ -2,9 +2,16 @@ use crate::commands::download::download_file;
 use std::io::Read;
 use std::path::PathBuf;
 use std::process::Stdio;
-use std::{fs::File, os::windows::process::CommandExt};
-use sysinfo::{System, SystemExt};
+use std::{ fs::File, os::windows::process::CommandExt };
+use sysinfo::{ System, SystemExt };
 use winapi::um::winbase::CREATE_SUSPENDED;
+use windows::Win32::Foundation::HWND;
+use windows::Win32::UI::Shell::ShellExecuteW;
+use windows::Win32::UI::WindowsAndMessaging::{ SW_HIDE, SW_SHOW };
+use windows::core::{ PCWSTR, w };
+
+use std::ffi::CString;
+use windows::Win32::UI::WindowsAndMessaging::SW_SHOWNORMAL;
 
 #[cfg(target_os = "windows")]
 const CREATE_NO_WINDOW: u32 = 0x08000000;
@@ -54,8 +61,8 @@ pub fn search_for_version(path: &str) -> Result<Vec<String>, String> {
     file.read_to_end(&mut buffer).map_err(|e| e.to_string())?;
 
     let pattern = [
-        0x2b, 0x00, 0x2b, 0x00, 0x46, 0x00, 0x6f, 0x00, 0x72, 0x00, 0x74, 0x00, 0x6e, 0x00, 0x69,
-        0x00, 0x74, 0x00, 0x65, 0x00, 0x2b, 0x00,
+        0x2b, 0x00, 0x2b, 0x00, 0x46, 0x00, 0x6f, 0x00, 0x72, 0x00, 0x74, 0x00, 0x6e, 0x00, 0x69, 0x00,
+        0x74, 0x00, 0x65, 0x00, 0x2b, 0x00,
     ];
 
     let mut matches = Vec::new();
@@ -69,7 +76,7 @@ pub fn search_for_version(path: &str) -> Result<Vec<String>, String> {
                 let utf16_slice = unsafe {
                     std::slice::from_raw_parts(
                         buffer[i..i + pattern.len() + end].as_ptr() as *const u16,
-                        (pattern.len() + end) / 2,
+                        (pattern.len() + end) / 2
                     )
                 };
                 let s = String::from_utf16_lossy(utf16_slice);
@@ -90,6 +97,39 @@ fn find_end(data: &[u8]) -> Option<usize> {
         i += 2;
     }
     None
+}
+
+pub fn run_elevated(exe: &str, params: &str, working_dir: Option<&str>) -> Result<(), String> {
+    let hwnd = HWND(std::ptr::null_mut());
+
+    let op = w!("runas");
+
+    fn to_utf16_z(s: &str) -> Vec<u16> {
+        use std::os::windows::ffi::OsStrExt;
+        std::ffi::OsStr::new(s).encode_wide().chain(std::iter::once(0)).collect()
+    }
+
+    let exe_w = to_utf16_z(exe);
+    let params_w = to_utf16_z(params);
+    let dir_w = working_dir.map(to_utf16_z);
+
+    let r = unsafe {
+        ShellExecuteW(
+            hwnd,
+            op,
+            windows::core::PCWSTR(exe_w.as_ptr()),
+            windows::core::PCWSTR(params_w.as_ptr()),
+            windows::core::PCWSTR(dir_w.as_ref().map_or(std::ptr::null(), |v| v.as_ptr())),
+            SW_SHOWNORMAL
+        )
+    };
+
+    let code = r.0 as isize;
+    if code <= 32 {
+        return Err(format!("ShellExecuteW failed with code {}", code));
+    }
+
+    Ok(())
 }
 
 #[tauri::command]
@@ -115,7 +155,7 @@ pub fn launch(code: String, path: String) -> Result<bool, String> {
 
     let mut game_dll = game_path.clone();
     game_dll.push(
-        "Engine\\Binaries\\ThirdParty\\NVIDIA\\NVaftermath\\Win64\\GFSDK_Aftermath_Lib.x64.dll",
+        "Engine\\Binaries\\ThirdParty\\NVIDIA\\NVaftermath\\Win64\\GFSDK_Aftermath_Lib.x64.dll"
     );
 
     if game_dll.exists() {
@@ -130,10 +170,7 @@ pub fn launch(code: String, path: String) -> Result<bool, String> {
                 Err(e) => {
                     a += 1;
                     if a >= max {
-                        return Err(format!(
-                            "failed to remove gfsdk after {} attempts: {}",
-                            max, e
-                        ));
+                        return Err(format!("failed to remove gfsdk after {} attempts: {}", max, e));
                     }
                     if !game_dll.exists() {
                         break;
@@ -154,16 +191,16 @@ pub fn launch(code: String, path: String) -> Result<bool, String> {
     }
 
     let mut game_dll = game_path.clone();
-    game_dll.push(
-        "Engine\\Binaries\\ThirdParty\\NVIDIA\\NVaftermath\\Win64\\GFSDK_Aftermath_Lib.x64.dll",
-    );
+    // game_dll.push(
+    //     "Engine\\Binaries\\ThirdParty\\NVIDIA\\NVaftermath\\Win64\\GFSDK_Aftermath_Lib.x64.dll"
+    // );
 
-    let _ = download_file("https://cdn.stellarfn.dev/DidYOuTestMe.dll", &game_dll);
+    // let _ = download_file("https://cdn.stellarfn.dev/DidYOuTestMe.dll", &game_dll);
 
     //  let _ = std::fs::copy(r"D:\Coding\Arsenic\x64\Stellar\Arsenic.dll", &game_dll);
 
     let mut game_real = game_path.clone();
-    game_real.push("FortniteGame\\Binaries\\Win64\\FortniteClient-Win64-Shipping.exe");
+    game_real.push("FortniteGame\\Binaries\\Win64\\Alea.exe");
     let mut fnlauncher = game_path.clone();
     fnlauncher.push("FortniteGame\\Binaries\\Win64\\FortniteLauncher.exe");
 
@@ -193,21 +230,32 @@ pub fn launch(code: String, path: String) -> Result<bool, String> {
     {
         use std::os::windows::process::CommandExt;
 
-        let _fort = std::process::Command::new(game_real)
-            .creation_flags(CREATE_NO_WINDOW)
-            .args(&fort_args)
-            .stdout(Stdio::piped())
-            .spawn()
-            .map_err(|e| format!("Failed to start Stellar: {}", e))?;
+        // let _fort = std::process::Command
+        //     ::new(game_real)
+        //     .creation_flags(CREATE_NO_WINDOW)
+        //     .args(&fort_args)
+        //     .stdout(Stdio::piped())
+        //     .spawn()
+        //     .map_err(|e| format!("Failed to start Stellar: {}", e))?;
 
-        let _fnlauncherfr = std::process::Command::new(fnlauncher)
+        let exe_str = game_real.to_str().ok_or("Invalid executable path")?;
+        let params = fort_args.join(" ");
+
+        let work_dir = game_real.parent().and_then(|p| p.to_str());
+        println!("work_dir: {:?}", work_dir);
+
+        run_elevated(exe_str, &params, work_dir)?;
+
+        let _fnlauncherfr = std::process::Command
+            ::new(fnlauncher)
             .creation_flags(CREATE_NO_WINDOW | CREATE_SUSPENDED)
             .args(&fort_args)
             .stdout(Stdio::piped())
             .spawn()
             .map_err(|e| format!("Failed to start Stellar: {}", e))?;
 
-        let _ac = std::process::Command::new(fnac)
+        let _ac = std::process::Command
+            ::new(fnac)
             .creation_flags(CREATE_NO_WINDOW | CREATE_SUSPENDED)
             .args(&fort_args)
             .stdout(Stdio::piped())
@@ -217,19 +265,22 @@ pub fn launch(code: String, path: String) -> Result<bool, String> {
 
     #[cfg(not(target_os = "windows"))]
     {
-        let _fn = std::process::Command::new(game_real)
+        let _fn = std::process::Command
+            ::new(game_real)
             .args(&fort_args)
             .stdout(Stdio::piped())
             .spawn()
             .map_err(|e| format!("Failed to start Stellar: {}", e))?;
 
-        let _fnlauncherfr = std::process::Command::new(fnlauncher)
+        let _fnlauncherfr = std::process::Command
+            ::new(fnlauncher)
             .args(&fort_args)
             .stdout(Stdio::piped())
             .spawn()
             .map_err(|e| format!("Failed to start Stellar: {}", e))?;
 
-        let _ac = std::process::Command::new(fnac)
+        let _ac = std::process::Command
+            ::new(fnac)
             .args(&fort_args)
             .stdout(Stdio::piped())
             .spawn()
@@ -253,7 +304,7 @@ pub fn exit_all() {
         "FortniteClient-Win64-Shipping_BE.exe",
         "EasyAntiCheat_EOS.exe",
         "EpicWebHelper.exe",
-        "EACStrapper.exe",
+        "EACStrapper.exe"
     ];
 
     for process in processes.iter() {
