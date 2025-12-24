@@ -14,6 +14,7 @@ import { relaunch } from "@tauri-apps/plugin-process";
 
 const Login: React.FC = () => {
   const [showWelcome, setShowWelcome] = useState(true);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
   const Routing = useRoutingStore();
   const AuthStore = useAuthStore();
   const nav = useNavigate();
@@ -21,7 +22,7 @@ const Login: React.FC = () => {
   useEffect(() => {
     (async () => {
       await Routing.initRouting(["auth", "public", "account", "oauth"]);
-      AuthStore.init();
+      setIsLoggedIn(await AuthStore.init());
 
       const update = await check();
       if (update) {
@@ -55,8 +56,8 @@ const Login: React.FC = () => {
     })();
 
     const status = async (): Promise<Boolean> => {
-      if (AuthStore.jwt) {
-        return await AuthStore.login(AuthStore.jwt);
+      if (isLoggedIn) {
+        return await AuthStore.login(AuthStore.jwt ?? "");
       }
 
       return false;
