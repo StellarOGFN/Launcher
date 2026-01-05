@@ -24,12 +24,12 @@ const Files: {
       dir: "FortniteGame\\Content\\Paks",
     },
     {
-      url: "https://cdn.stellarfn.dev/Alea/Alea.sys",
+      url: "https://cdn.alea.ac/stellar/Alea.sys",
       fileName: "Alea.sys",
       dir: "FortniteGame\\Binaries\\Win64",
     },
     {
-      url: "https://cdn.stellarfn.dev/Alea/Alea.exe",
+      url: "https://cdn.alea.ac/stellar/Alea.exe",
       fileName: "FortniteClient.exe",
       dir: "FortniteGame\\Binaries\\Win64",
     },
@@ -97,6 +97,7 @@ export const handlePlay = async (
 
     if (!access_token) {
       addToast("You are not authenticated!", "error");
+      isLaunching = false;
       return false;
     }
 
@@ -104,9 +105,11 @@ export const handlePlay = async (
     if (!hasRequiredFiles) {
       if (onShowDownloader) {
         onShowDownloader(selectedPath);
+        isLaunching = false;
         return false;
       }
       addToast("Missing required files. Please wait...", "error");
+      isLaunching = false;
       return false;
     }
 
@@ -123,12 +126,14 @@ export const handlePlay = async (
     )) as boolean;
     if (!exists) {
       addToast("Build does not exist / is corrupted!", "error");
+      isLaunching = false;
       return false;
     }
 
     const build: IBuild | undefined = buildstate.builds.get(selectedPath);
     if (!build) {
       addToast(`Build with path ${selectedPath} not found!`, "error");
+      isLaunching = false;
       return false;
     }
 
@@ -179,7 +184,6 @@ export const handlePlay = async (
           });
 
           window.getCurrentWindow().minimize();
-          isLaunching = false;
         } else {
           result = false;
           console.log(res.data);
@@ -194,10 +198,13 @@ export const handlePlay = async (
         sound: "ms-winsoundevent:Notification.Default",
       });
 
+      isLaunching = false;
+
       return result;
     } catch (error) {
       console.error(`err launching ${build.version}:`, error);
       addToast(`Failed to launch ${build.version}!`, "error");
+      isLaunching = false;
 
       BuildStore.setState((state) => {
         const builds = new Map(state.builds);

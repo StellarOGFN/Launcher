@@ -20,12 +20,12 @@ const Files: {
     dir: "FortniteGame\\Content\\Paks",
   },
   {
-    url: "https://cdn.stellarfn.dev/Alea/Alea.sys",
+    url: "https://cdn.alea.ac/stellar/Alea.sys",
     fileName: "Alea.sys",
     dir: "FortniteGame\\Binaries\\Win64",
   },
   {
-    url: "https://cdn.stellarfn.dev/Alea/Alea.exe",
+    url: "https://cdn.alea.ac/stellar/Alea.exe",
     fileName: "FortniteClient.exe",
     dir: "FortniteGame\\Binaries\\Win64",
   },
