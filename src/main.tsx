@@ -10,9 +10,10 @@ import Library from "./pages/Library";
 import Settings from "./pages/Settings";
 import { useToastStore } from "./zustand/ToastStore";
 import { ToastContainer } from "./components/Global/Toast";
+import Leaderboards from "./pages/Leaderboards";
 
 const root = ReactDOM.createRoot(
-  document.getElementById("root") as HTMLElement
+  document.getElementById("root") as HTMLElement,
 );
 
 const App = () => {
@@ -42,6 +43,7 @@ const App = () => {
         <Route path="/home" element={<Home />} />
         <Route path="/library" element={<Library />} />
         <Route path="/settings" element={<Settings />} />
+        <Route path="/leaderboards" element={<Leaderboards />} />
       </Routes>
 
       <ToastContainer toasts={toasts} onClose={removeToast} />
@@ -54,5 +56,5 @@ document.addEventListener("contextmenu", (e) => e.preventDefault());
 root.render(
   <HashRouter>
     <App />
-  </HashRouter>
+  </HashRouter>,
 );

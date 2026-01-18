@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { GoHomeFill } from "react-icons/go";
-import { LibraryBig, Pencil, X } from "lucide-react";
+import { LibraryBig, Pencil, X, Trophy } from "lucide-react";
 import { TbSettings, TbLogout } from "react-icons/tb";
 import { motion, easeOut, AnimatePresence } from "framer-motion";
 import { useAuthStore } from "@/zustand/AuthStore";
@@ -100,6 +100,19 @@ const Sidebar: React.FC = () => {
               }`}
             />
           </button>
+
+          <button
+            onClick={() => navigate("/leaderboards")}
+            className={`${baseButton} ${
+              location.pathname === "/leaderboards" ? activeButton : hoverButton
+            }`}
+          >
+            <Trophy
+              className={`${iconClass} ${
+                location.pathname === "/leaderboards" ? "text-white/80" : ""
+              }`}
+            />
+          </button>
         </div>
 
         <div className="relative z-[50]" ref={profileRef}>
@@ -173,7 +186,7 @@ const Sidebar: React.FC = () => {
                               <button
                                 onClick={() => {
                                   setNewUsername(
-                                    AuthStore.account?.DisplayName || ""
+                                    AuthStore.account?.DisplayName || "",
                                   );
                                   setShowEditDialog(true);
                                 }}

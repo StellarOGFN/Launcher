@@ -22,6 +22,7 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
   init: async () => {
     const Routing = useRoutingStore.getState();
     const r = Routing.Routes.get("account");
+
     Stellar.Storage.set("auth.base", r ? r.url : null);
     set({ base: r ? r.url : null });
 
