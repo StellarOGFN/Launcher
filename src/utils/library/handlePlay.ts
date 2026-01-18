@@ -223,7 +223,7 @@ export const handlePlay = async (
       sendNotification({
         title: `Starting ${build.version}`,
         body: `This may take a while so please wait while the game loads!`,
-        sound: "ms-winsoundevent:Notification.Default",
+        sound: "Default",
       });
 
       isLaunching = false;
