@@ -1,10 +1,18 @@
 import React, { useState, useRef, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { GoHomeFill } from "react-icons/go";
-import { LibraryBig, Pencil, X, Trophy } from "lucide-react";
+import {
+  LibraryBig,
+  Pencil,
+  X,
+  Trophy,
+  AlertCircle,
+  Loader,
+} from "lucide-react";
 import { TbSettings, TbLogout } from "react-icons/tb";
 import { motion, easeOut, AnimatePresence } from "framer-motion";
 import { useAuthStore } from "@/zustand/AuthStore";
+import { Stellar } from "@/stellar";
 import GlassContainer from "../Global/GlassContainer";
 
 const Sidebar: React.FC = () => {
@@ -12,8 +20,11 @@ const Sidebar: React.FC = () => {
   const navigate = useNavigate();
   const [showProfileMenu, setShowProfileMenu] = useState(false);
   const AuthStore = useAuthStore();
+  const { account, jwt, base } = AuthStore;
   const [showEditDialog, setShowEditDialog] = useState(false);
   const [newUsername, setNewUsername] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const profileRef = useRef<HTMLDivElement>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
@@ -261,24 +272,102 @@ const Sidebar: React.FC = () => {
                 <input
                   type="text"
                   value={newUsername}
-                  onChange={(e) => setNewUsername(e.target.value)}
+                  onChange={(e) => {
+                    setNewUsername(e.target.value);
+                    setError(null);
+                  }}
                   className="w-full px-4 py-2 bg-neutral-800 border border-white/10 rounded-lg text-white focus:outline-none focus:border-white/30 mb-4"
                   placeholder="New username"
+                  disabled={loading}
+                  maxLength={32}
                 />
+
+                {error && (
+                  <div className="flex items-center gap-2 p-2 mb-4 rounded-lg bg-red-950/40 border border-red-600/40">
+                    <AlertCircle className="w-4 h-4 text-red-400 flex-shrink-0" />
+                    <p className="text-xs text-red-300">{error}</p>
+                  </div>
+                )}
 
                 <div className="flex gap-2 justify-end">
                   <button
-                    onClick={() => setShowEditDialog(false)}
-                    className="px-4 py-2 bg-gray/10 hover:bg-white/20 border border-white/20 text-white rounded-lg backdrop-blur-md transition-colors"
+                    onClick={() => {
+                      setShowEditDialog(false);
+                      setError(null);
+                      setNewUsername("");
+                    }}
+                    disabled={loading}
+                    className="px-4 py-2 bg-white/10 hover:bg-white/20 border border-white/20 text-white rounded-lg backdrop-blur-md transition-colors disabled:opacity-50"
                   >
                     Cancel
                   </button>
 
                   <button
-                    // onClick={}
-                    className="px-4 py-2 bg-white/10 hover:bg-white/20 border border-white/20 text-white rounded-lg backdrop-blur-md transition-colors"
+                    onClick={async () => {
+                      if (!newUsername.trim()) {
+                        setError("Please enter a new username");
+                        return;
+                      }
+
+                      if (newUsername.length < 3 || newUsername.length > 32) {
+                        setError(
+                          "Username must be between 3 and 32 characters",
+                        );
+                        return;
+                      }
+
+                      if (newUsername === account?.DisplayName) {
+                        setError(
+                          "New username must be different from current username",
+                        );
+                        return;
+                      }
+
+                      setLoading(true);
+                      setError(null);
+
+                      try {
+                        const response = await Stellar.Requests.changeUsername(
+                          base!,
+                          newUsername,
+                          jwt!,
+                        );
+
+                        if (response.ok) {
+                          const updatedAccount = {
+                            ...account,
+                            ...response.data.account,
+                          };
+
+                          Stellar.Storage.set("auth.account", updatedAccount);
+                          useAuthStore.setState({ account: updatedAccount });
+
+                          setShowEditDialog(false);
+                          setNewUsername("");
+                        } else {
+                          const errorMsg =
+                            (response.data as any)?.error ||
+                            "Failed to change username";
+                          setError(errorMsg);
+                        }
+                      } catch (err) {
+                        setError("An error occurred while changing username");
+                        console.error(err);
+                      } finally {
+                        setLoading(false);
+                      }
+                    }}
+                    disabled={loading || !newUsername.trim()}
+                    className="px-4 py-2 bg-white/10 hover:bg-white/20 border border-white/20 text-white rounded-lg backdrop-blur-md transition-colors disabled:opacity-50 flex items-center gap-2"
                   >
-                    Save Changes
+                    {loading ? (
+                      <>
+                        <Loader className="w-3 h-3 animate-spin" />
+                        Saving...
+                      </>
+                    ) : (
+                      "Save Changes"
+                    )}
                   </button>
                 </div>
               </GlassContainer>
