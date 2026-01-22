@@ -14,6 +14,7 @@ const BuildCard: React.FC<{
   onClose: (path: string) => void;
 }> = ({ path, build, onDelete, onPlay, onClose, onLaunch }) => {
   const [isLoaded, setIsLoaded] = useState(false);
+  const [isStarting, setIsStarting] = useState(false);
 
   const prevLoading = useRef(build.loading);
 
@@ -24,13 +25,19 @@ const BuildCard: React.FC<{
     prevLoading.current = build.loading;
   }, [build.loading, onLaunch, path]);
 
+  useEffect(() => {
+    if (!build.loading && !build.open) {
+      setIsStarting(false);
+    }
+  }, [build.loading, build.open]);
+
   const hasSplash = build.splash && build.splash !== "no splash";
 
   return (
     <GlassContainer
       onClick={() => {
         // some ppl could get confused cuz the play button is there after hover so
-        if (!build.loading) return onPlay(path);
+        if (!build.loading && !build.open) return onPlay(path);
       }}
       className="relative w-full h-[260px] 2xl:h-[320px] rounded-md border border-white/25 bg-gradient-to-t from-black/40 to-transparent overflow-hidden shadow-lg group"
     >
@@ -74,15 +81,23 @@ const BuildCard: React.FC<{
           <button
             onClick={(e) => {
               e.stopPropagation();
-              if (build.open) return onClose(path);
-              if (!build.loading) return onPlay(path);
+
+              if (build.open) {
+                onClose(path);
+                return;
+              }
+
+              if (isStarting) return;
+              setIsStarting(true);
+              onPlay(path);
             }}
-            className="flex items-center justify-center text-white/55 p-2 rounded-md border border-white/25 hover:text-white/80 translate-x-10 group-hover:translate-x-0 hover:border-white/50 transition duration-200 bg-gray-500/5 backdrop-blur-sm shadow-sm"
+            disabled={build.open ? false : isStarting}
+            className="flex items-center justify-center p-2 rounded-md border border-white/25 text-white/55 hover:border-white/50 hover:text-white/80 translate-x-10 group-hover:translate-x-0 transition duration-200 bg-gray-500/5 backdrop-blur-sm shadow-sm focus:outline-none disabled:hover:text-white/55 disabled:hover:border-white/25 disabled:cursor-not-allowed"
           >
             {build.open ? (
               <MdClose className="w-3 h-3" />
-            ) : build.loading ? (
-              <div className="w-3 h-3 rounded-full bg-transparent border-px border-white/25 border-t-transparent animate-spin" />
+            ) : isStarting || build.loading ? (
+              <div className="w-3 h-3 rounded-full border-2 border-white/55 border-t-transparent animate-spin" />
             ) : (
               <IoPlay className="w-3 h-3" />
             )}
@@ -93,7 +108,7 @@ const BuildCard: React.FC<{
               e.stopPropagation();
               onDelete(path);
             }}
-            className="flex items-center justify-center text-white/55 p-2 rounded-md border border-white/25 hover:text-white/80 translate-x-10 group-hover:translate-x-0 hover:border-white/50 transition duration-200 bg-gray-500/5 backdrop-blur-sm shadow-sm"
+            className="flex items-center justify-center text-white/55 p-2 rounded-md border border-white/25 hover:text-white/80 translate-x-10 group-hover:translate-x-0 hover:border-white/50 transition duration-200 bg-gray-500/5 backdrop-blur-sm shadow-sm focus:outline-none"
           >
             <MdDeleteForever className="w-3 h-3" />
           </button>

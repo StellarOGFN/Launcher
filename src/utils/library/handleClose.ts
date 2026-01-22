@@ -23,7 +23,7 @@ export const handleClose = async (selectedPath: string) => {
     sendNotification({
       title: "Stellar",
       body: "Build does not exist / is corrupted!",
-      sound: "ms-winsoundevent:Notification.Default",
+      sound: "Default",
     });
     return false;
   }
@@ -33,7 +33,7 @@ export const handleClose = async (selectedPath: string) => {
     sendNotification({
       title: "Stellar",
       body: `Build with path ${selectedPath} not found!`,
-      sound: "ms-winsoundevent:Notification.Default",
+      sound: "Default",
     });
     return false;
   }
@@ -53,7 +53,7 @@ export const handleClose = async (selectedPath: string) => {
     sendNotification({
       title: "Stellar",
       body: `Failed to launch ${build.version}!`,
-      sound: "ms-winsoundevent:Notification.Default",
+      sound: "Default",
     });
 
     build.open = false;
