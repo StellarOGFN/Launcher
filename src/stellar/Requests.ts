@@ -65,7 +65,7 @@ export class Requests {
     token: string,
   ) {
     return this.post<T>(
-      `${url}/stellar/launcher/v1/account/change-username`,
+      `${url}/change-username`,
       { newUsername },
       { Authorization: `Bearer ${token}` },
     );
