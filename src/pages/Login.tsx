@@ -27,6 +27,7 @@ const Login: React.FC = () => {
         "account",
         "oauth",
         "leaderboards",
+        "rewards",
       ]);
       setIsLoggedIn(await AuthStore.init());
 
