@@ -21,14 +21,20 @@ const Login: React.FC = () => {
 
   useEffect(() => {
     (async () => {
-      await Routing.initRouting(["auth", "public", "account", "oauth"]);
+      await Routing.initRouting([
+        "auth",
+        "public",
+        "account",
+        "oauth",
+        "leaderboards",
+      ]);
       setIsLoggedIn(await AuthStore.init());
 
       const update = await check();
       if (update) {
         // https://v2.tauri.app/plugin/updater/#checking-for-updates
         console.log(
-          `found update ${update.version} from ${update.date} with notes ${update.body}`
+          `found update ${update.version} from ${update.date} with notes ${update.body}`,
         );
         let downloaded = 0;
         let contentLength: number | undefined = 0;
@@ -37,7 +43,7 @@ const Login: React.FC = () => {
             case "Started":
               contentLength = event.data.contentLength;
               console.log(
-                `started downloading ${event.data.contentLength} bytes`
+                `started downloading ${event.data.contentLength} bytes`,
               );
               break;
             case "Progress":
