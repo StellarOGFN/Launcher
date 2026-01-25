@@ -38,6 +38,18 @@ const Leaderboards: React.FC = () => {
   const [error, setError] = useState(false);
   const Routing = useRoutingStore();
 
+  const page_limit = 7;
+
+  const goToUserRankPage = () => {
+    if (!userRank || userRank.rank <= 0) return;
+
+    const targetPage = Math.ceil(userRank.rank / page_limit);
+
+    if (targetPage >= 1 && targetPage <= totalPages) {
+      setPage(targetPage);
+    }
+  };
+
   const fetchLeaderboard = useCallback(async () => {
     if (!auth.jwt || !auth.base) return;
 
@@ -52,7 +64,7 @@ const Leaderboards: React.FC = () => {
       setLoading(true);
       setError(false);
       const req = await Stellar.Requests.get<LeaderboardResponse>(
-        `${leaderboardRoute}?page=${page}&limit=7`,
+        `${leaderboardRoute}?page=${page}&limit=${page_limit}`,
         { Authorization: `Bearer ${auth.jwt}` },
       );
 
@@ -180,9 +192,13 @@ const Leaderboards: React.FC = () => {
                 <p className="text-white text-sm font-medium">
                   {userRank.username}
                 </p>
-                <p className="text-white/40 text-xs">
+                <button
+                  onClick={goToUserRankPage}
+                  className="text-white/40 text-xs hover:text-white transition-colors"
+                  title="Go to your position in the leaderboard"
+                >
                   Rank #{userRank.rank.toLocaleString()}
-                </p>
+                </button>
               </div>
             </div>
             <div className="text-right">
