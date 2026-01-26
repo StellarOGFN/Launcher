@@ -14,6 +14,9 @@ interface Commit {
       date: string;
     };
   };
+  author?: {
+    login: string;
+  };
 }
 
 const GithubChangelogs: React.FC<{
@@ -75,7 +78,7 @@ const GithubChangelogs: React.FC<{
         <GrGithub className="w-5 h-5" /> Launcher Updates
       </h2>
       <div className="grid grid-cols-2 gap-2">
-        {commits.map(({ sha, commit }) => (
+        {commits.map(({ sha, commit, author }) => (
           <div
             key={sha}
             className="p-4 rounded-md bg-white/10 hover:bg-white/20 transition-colors select-none"
@@ -89,14 +92,16 @@ const GithubChangelogs: React.FC<{
             </h4>
             <p className="text-xs text-gray-400 mt-1">
               by{" "}
-              <a
-                onClick={() => {
-                  openUrl(`https://github.com/${commit.author.name}`);
-                }}
-                className="text-gray-400 hover:text-white transition-all duration-200 cursor-pointer"
-              >
-                {commit.author.name}
-              </a>
+              {author?.login ? (
+                <a
+                  onClick={() => openUrl(`https://github.com/${author.login}`)}
+                  className="text-gray-400 hover:text-white transition-all duration-200 cursor-pointer"
+                >
+                  {commit.author.name}
+                </a>
+              ) : (
+                <span>{commit.author.name}</span>
+              )}
             </p>
           </div>
         ))}
