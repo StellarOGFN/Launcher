@@ -231,7 +231,7 @@ export const handlePlay = async (
       return result;
     } catch (error) {
       console.error(`err launching ${build.version}:`, error);
-      addToast(`Failed to launch ${build.version}!`, "error");
+      addToast(`Failed to launch ${build.version}! (DEV: ${error})`, "error");
       isLaunching = false;
 
       BuildStore.setState((state) => {
