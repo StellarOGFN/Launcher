@@ -31,7 +31,7 @@ interface RewardsState {
 export const useRewardsStore = create<RewardsState>((set, get) => ({
   rewards: [],
   loading: true,
-  showModal: false,
+  showModal: true,
   claiming: false,
 
   fetchRewards: async (accountId: string, jwt: string) => {

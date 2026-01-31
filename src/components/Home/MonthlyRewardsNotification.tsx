@@ -48,8 +48,7 @@ const MonthlyRewardsNotification: React.FC = () => {
     await claimReward(rewards[0].Id, rewards[0].Rank, auth.jwt);
   };
 
-  const currentReward = rewards[0];
-
+  let currentReward = rewards[0];
   return (
     <>
       <AnimatePresence>
@@ -58,7 +57,7 @@ const MonthlyRewardsNotification: React.FC = () => {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black/70 backdrop-blur-md z-[100] flex items-center justify-center p-6"
+            className="fixed inset-0 bg-black/40 backdrop-blur-lg z-[100] flex items-center justify-center p-6"
             onClick={() => !claiming && closeModal()}
           >
             <motion.div
@@ -82,7 +81,7 @@ const MonthlyRewardsNotification: React.FC = () => {
               onClick={(e) => e.stopPropagation()}
               className="w-full max-w-md"
             >
-              <GlassContainer className="border border-white/10 p-6 overflow-hidden relative">
+              <GlassContainer className="border border-white/10 p-6 overflow-hidden relative rounded-md shadow-xl">
                 <motion.div
                   initial={{ x: -20, opacity: 0 }}
                   animate={{ x: 0, opacity: 1 }}
@@ -90,7 +89,7 @@ const MonthlyRewardsNotification: React.FC = () => {
                   className="mb-6"
                 >
                   <h2 className="text-xl font-bold text-white mb-1">
-                    Monthly Reward
+                    Monthly Leaderboard Reward!
                   </h2>
                   <p className="text-white/40 text-sm">
                     {MONTHS[currentReward.Month - 1]} {currentReward.Year}
