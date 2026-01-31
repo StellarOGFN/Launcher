@@ -189,9 +189,9 @@ const Sidebar: React.FC = () => {
                             className="w-8 h-8 rounded-lg object-cover"
                             draggable={false}
                           />
-                          <div className="flex flex-col">
+                          <div className="flex flex-col flex-1 min-w-0">
                             <div className="flex items-center gap-1.5">
-                              <h3 className="font-medium text-white text-sm">
+                              <h3 className="font-medium text-white text-sm truncate">
                                 {AuthStore.account?.DisplayName}
                               </h3>
                               <button
@@ -201,7 +201,7 @@ const Sidebar: React.FC = () => {
                                   );
                                   setShowEditDialog(true);
                                 }}
-                                className="text-white/60 hover:text-white transition-colors"
+                                className="text-white/60 hover:text-white transition-colors flex-shrink-0"
                               >
                                 <Pencil size={12} />
                               </button>
