@@ -52,6 +52,22 @@ const checkFiles = async (buildPath: string): Promise<boolean> => {
         }
       );
     }
+    else {
+      await invoke("delete_file", {
+        path: await join(
+          buildPath,
+          "FortniteGame\\Content\\Paks",
+          "pakchunkStellarBubble-WindowsClient.pak"
+        ),
+      }).catch(() => { });
+      await invoke("delete_file", {
+        path: await join(
+          buildPath,
+          "FortniteGame\\Content\\Paks",
+          "pakchunkStellarBubble-WindowsClient.sig"
+        ),
+      }).catch(() => { });
+    }
     for (const file of Files) {
       const directory = await join(
         buildPath,

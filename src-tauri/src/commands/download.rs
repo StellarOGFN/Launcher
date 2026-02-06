@@ -60,6 +60,19 @@ pub async fn get_file_size(url: String) -> Result<u64, String> {
 }
 
 #[tauri::command]
+pub async fn delete_file(path: &str) -> Result<bool, String> {
+    let file_path = std::path::PathBuf::from(path);
+
+    if !file_path.exists() {
+        return Ok(false);
+    }
+
+    std::fs::remove_file(&file_path).map_err(|e| format!("Failed to delete file: {}", e))?;
+
+    Ok(true)
+}
+
+#[tauri::command]
 pub async fn download_file_command(
     url: String,
     dest: String,

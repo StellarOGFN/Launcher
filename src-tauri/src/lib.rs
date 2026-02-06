@@ -40,7 +40,8 @@ pub fn run() {
                 commands::builds::launch,
                 commands::builds::exit_all,
                 commands::download::download_file_command,
-                commands::download::get_file_size
+                commands::download::get_file_size,
+                commands::download::delete_file
             ]
         )
         .run(tauri::generate_context!())
