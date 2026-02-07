@@ -258,6 +258,7 @@ const TournamentEventWindow: React.FC<TournamentEventWindowProps> = ({
 
   const stats = playerStats.data.stats;
   const scoringRules = formatScoringRules(details.data.rules.scoring);
+  const isUpcoming = details.data.status === "upcoming";
 
   return (
     <div className="w-full h-full flex flex-col p-4 pl-20 pt-8">
@@ -286,7 +287,16 @@ const TournamentEventWindow: React.FC<TournamentEventWindowProps> = ({
 
       <div className="flex-1 grid grid-cols-2 gap-3 min-h-0">
         <div className="overflow-auto space-y-3">
-          <GlassContainer className="p-3 border border-white/10">
+          <GlassContainer
+            className={`p-3 border border-white/10 relative ${isUpcoming ? "opacity-40" : ""}`}
+          >
+            {isUpcoming && (
+              <div className="absolute inset-0 bg-black/60 flex items-center justify-center z-10">
+                <p className="text-white/80 text-xs font-semibold">
+                  Tournament Not Started
+                </p>
+              </div>
+            )}
             <div className="mb-3">
               <h3 className="text-white text-sm font-bold">Session 1</h3>
               <p className="text-white/40 text-[10px]">
