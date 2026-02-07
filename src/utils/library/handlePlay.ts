@@ -23,11 +23,11 @@ const Files: {
       fileName: "pakchunkStellar-WindowsClient.sig",
       dir: "FortniteGame\\Content\\Paks",
     },
-    {
-      url: "https://cloud.arc-services.dev/modules/anticheat/Arc.exe",
-      fileName: "Arc.exe",
-      dir: "Arc",
-    },
+    // {
+    //   url: "https://cloud.arc-services.dev/modules/anticheat/Arc.exe",
+    //   fileName: "Arc.exe",
+    //   dir: "Arc",
+    // },
     {
       url: "https://cdn.stellarfn.dev/Arc/Config.json",
       fileName: "Config.json",
@@ -53,21 +53,28 @@ const checkFiles = async (buildPath: string): Promise<boolean> => {
       );
     }
     else {
-      await invoke("delete_file", {
-        path: await join(
-          buildPath,
-          "FortniteGame\\Content\\Paks",
-          "pakchunkStellarBubble-WindowsClient.pak"
-        ),
-      }).catch(() => { });
-      await invoke("delete_file", {
-        path: await join(
-          buildPath,
-          "FortniteGame\\Content\\Paks",
-          "pakchunkStellarBubble-WindowsClient.sig"
-        ),
-      }).catch(() => { });
+      const pakPath = await join(
+        buildPath,
+        "FortniteGame\\Content\\Paks",
+        "pakchunkStellarBubble-WindowsClient.pak"
+      );
+
+      const sigPath = await join(
+        buildPath,
+        "FortniteGame\\Content\\Paks",
+        "pakchunkStellarBubble-WindowsClient.sig"
+      );
+
+      if (await invoke("check_file_exists", { path: pakPath })) {
+        await invoke("delete_file", { path: pakPath }).catch(() => { });
+      }
+
+      if (await invoke("check_file_exists", { path: sigPath })) {
+        await invoke("delete_file", { path: sigPath }).catch(() => { });
+      }
     }
+
+
     for (const file of Files) {
       const directory = await join(
         buildPath,
@@ -201,12 +208,17 @@ export const handlePlay = async (
           let extraArgs: string[] = [];
           const preEdits = Stellar.Storage.get<boolean>("game.disablePreEdits");
           const resetOnRelease = Stellar.Storage.get<boolean>("game.resetOnRelease");
+          const preferredItems = Stellar.Storage.get<string>("game.preferredItemsCmd") || [];
           if (preEdits) {
             extraArgs.push("-dpe");
           }
           if (resetOnRelease) {
             extraArgs.push("-ror");
           }
+          if (preferredItems.length > 0) {
+            extraArgs.push(`-preferreditems=${preferredItems}`);
+          }
+          console.log("extra args:", extraArgs);
 
           const identity = Stellar.Arc_Instance.CreateIdentity(
             "Stellar-Fortnite",

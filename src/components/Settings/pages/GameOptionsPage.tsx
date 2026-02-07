@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import GlassContainer from "@/components/Global/GlassContainer";
 import { Option } from "../Option";
 import { motion, AnimatePresence } from "framer-motion";
@@ -18,11 +18,11 @@ const INVENTORY_ITEMS = [
     name: "Consumable",
     src: "/slots/T-Icon-Consumable-128.png",
   },
-  {
-    id: "explosive",
-    name: "Explosive",
-    src: "/slots/T-Icon-Explosive-128.png",
-  },
+  // {
+  //   id: "explosive",
+  //   name: "Explosive",
+  //   src: "/slots/T-Icon-Explosive-128.png",
+  // },
   { id: "pistol", name: "Pistol", src: "/slots/T-Icon-Pistol-128.png" },
   { id: "shotgun", name: "Shotgun", src: "/slots/T-Icon-Shotgun-128.png" },
   { id: "smg", name: "SMG", src: "/slots/T-Icon-SMG-128.png" },
@@ -30,28 +30,58 @@ const INVENTORY_ITEMS = [
   { id: "utility", name: "Utility", src: "/slots/T-Icon-Utility-128.png" },
 ];
 
+const recordToSwap: Record<string, string> = {
+  assault: "Rifle",
+  shotgun: "Shotgun",
+  smg: "SMG",
+  pistol: "Pistol",
+  sniper: "Sniper",
+  consumable: "Consumable",
+  utility: "Utility",
+};
+
 export const GameOptionsPage = () => {
   const [preEditsDisabled, setPreEditsDisabled] = useState(
-    Stellar.Storage.get("game.disablePreEdits") || false
+    Stellar.Storage.get("game.disablePreEdits") || false,
   );
   const [resetOnRelease, setResetOnRelease] = useState(
-    Stellar.Storage.get("game.resetOnRelease") || false
+    Stellar.Storage.get("game.resetOnRelease") || false,
   );
   const [bubbleWrapEnabled, setBubbleWrapEnabled] = useState(
-    Stellar.Storage.get("game.bubbleWrapEnabled") || false
+    Stellar.Storage.get("game.bubbleWrapEnabled") || false,
   );
   const [selectedSlot, setSelectedSlot] = useState<number | null>(null);
-  const [loadout, setLoadout] = useState<Array<string | null>>([
-    null,
-    null,
-    null,
-    null,
-    null,
-  ]);
+  const [loadout, setLoadout] = useState<Array<string | null>>(() => {
+    return (
+      Stellar.Storage.get("game.preferredItemSlots") ?? [
+        null,
+        null,
+        null,
+        null,
+        null,
+      ]
+    );
+  });
 
-  // const handleSlotClick = (index: number) => {
-  //   setSelectedSlot(index);
-  // };
+  useEffect(() => {
+    Stellar.Storage.set("game.preferredItemSlots", loadout);
+
+    const pairs = loadout
+      .map((id, slotIndex) => {
+        if (!id) return null;
+        const name = recordToSwap[id];
+        if (!name) return null;
+        return `${name}:${slotIndex + 1}`;
+      })
+      .filter(Boolean)
+      .join(",");
+
+    Stellar.Storage.set("game.preferredItemsCmd", pairs);
+  }, [loadout]);
+
+  const handleSlotClick = (index: number) => {
+    setSelectedSlot(index);
+  };
 
   const handleItemSelect = (itemId: string) => {
     if (selectedSlot === null) return;
@@ -68,12 +98,12 @@ export const GameOptionsPage = () => {
     setSelectedSlot(null);
   };
 
-  // const clearSlot = (index: number, e: React.MouseEvent) => {
-  //   e.stopPropagation();
-  //   const newLoadout = [...loadout];
-  //   newLoadout[index] = null;
-  //   setLoadout(newLoadout);
-  // };
+  const clearSlot = (index: number, e: React.MouseEvent) => {
+    e.stopPropagation();
+    const newLoadout = [...loadout];
+    newLoadout[index] = null;
+    setLoadout(newLoadout);
+  };
 
   const getItemById = (id: string | null) => {
     if (!id) return null;
@@ -121,7 +151,7 @@ export const GameOptionsPage = () => {
         </GlassContainer>
       </div>
 
-      {/* <div>
+      <div>
         <h3 className="text-md font-semibold text-white mb-1">
           Preferred Item Slots
         </h3>
@@ -130,7 +160,7 @@ export const GameOptionsPage = () => {
           won't be used).
         </p>
 
-        <div className="grid grid-cols-2 gap-3 sm:grid-cols-2 md:grid-cols-5">
+        <div className="grid grid-cols-2 gap-3 sm:grid-cols-2 md:grid-cols-7">
           {loadout.map((itemId, index) => {
             const item = getItemById(itemId);
 
@@ -174,55 +204,6 @@ export const GameOptionsPage = () => {
                   </div>
                 )}
               </motion.button>
-            );
-          })}
-        </div>
-      </div> */}
-
-      <div>
-        <h3 className="text-md font-semibold text-white mb-1">
-          Preferred Item Slots{" "}
-          <span className="text-yellow-400/70 text-sm">(In Development)</span>
-        </h3>
-        <p className="text-xs text-white/40 mb-3">
-          This feature is currently in the works, check back later!
-        </p>
-
-        <div className="grid grid-cols-2 gap-3 sm:grid-cols-2 md:grid-cols-7 pointer-events-none opacity-50">
-          {loadout.map((itemId, index) => {
-            const item = getItemById(itemId);
-
-            return (
-              <div
-                key={index}
-                className={`
-            relative flex flex-col items-center justify-center p-4 rounded-xl border-2 aspect-square
-            ${
-              item
-                ? "border-white/40 bg-gradient-to-br from-white/10 to-white/5"
-                : "border-white/20 bg-white/5"
-            }
-          `}
-              >
-                <div className="absolute top-2 left-2 w-4 h-4 rounded-full bg-gradient-to-br from-white/30 to-white/10 flex items-center justify-center border border-white/40">
-                  <span className="text-white/70 text-xs font-bold">
-                    {index + 1}
-                  </span>
-                </div>
-
-                {item ? (
-                  <img
-                    src={item.src}
-                    alt={item.name}
-                    className="w-[85px] h-[85px] object-contain"
-                  />
-                ) : (
-                  <div className="flex flex-col items-center gap-1">
-                    <span className="text-white/40 text-3xl">+</span>
-                    <span className="text-white/30 text-xs">Select</span>
-                  </div>
-                )}
-              </div>
             );
           })}
         </div>
@@ -288,8 +269,8 @@ export const GameOptionsPage = () => {
                                 isInLoadout && !isCurrentSlot
                                   ? "border-white/10 bg-white/5 opacity-50 cursor-not-allowed"
                                   : isCurrentSlot
-                                  ? "border-white/20 bg-gradient-to-br from-white/10 to-white/10 shadow-lg shadow-white/10"
-                                  : "border-white/20 bg-white/5 hover:border-white/40 hover:bg-white/10 hover:shadow-lg hover:shadow-white/5"
+                                    ? "border-white/20 bg-gradient-to-br from-white/10 to-white/10 shadow-lg shadow-white/10"
+                                    : "border-white/20 bg-white/5 hover:border-white/40 hover:bg-white/10 hover:shadow-lg hover:shadow-white/5"
                               }
                             `}
                         >
