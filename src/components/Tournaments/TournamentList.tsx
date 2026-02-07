@@ -72,6 +72,7 @@ const TournamentList: React.FC<TournamentListProps> = ({
               <span>{tournament.schedule.date}</span>
               <span className="text-white/30">•</span>
               <span>{tournament.schedule.time}</span>
+              <span className="text-white/30">(UTC)</span>
             </div>
           )}
         </div>

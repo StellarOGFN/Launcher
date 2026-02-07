@@ -235,6 +235,20 @@ const Leaderboards: React.FC = () => {
                 : "Upcoming & active events"}
             </p>
           </div>
+          <div className="mb-6 grid grid-cols-[1fr_auto_260px] items-start">
+            <button
+              onClick={() => setActiveTab("leaderboard")}
+              className={`px-3 py-1.5 rounded text-xs font-medium transition-colors ${activeTab === "leaderboard" ? "bg-white/15 text-white" : "bg-white/5 text-white/50 hover:bg-white/10"}`}
+            >
+              Leaderboard
+            </button>
+            <button
+              onClick={() => setActiveTab("tournament")}
+              className={`px-3 py-1.5 rounded text-xs font-medium transition-colors ${activeTab === "tournament" ? "bg-white/15 text-white" : "bg-white/5 text-white/50 hover:bg-white/10"}`}
+            >
+              Tournaments
+            </button>
+          </div>
           <div className="flex items-center gap-3 relative z-10">
             {activeTab === "leaderboard" && userRank && userRank.rank > 0 && (
               <GlassContainer className="p-2 border border-white/10 rounded-md">
@@ -269,20 +283,6 @@ const Leaderboards: React.FC = () => {
                 </div>
               </GlassContainer>
             )}
-            <div className="flex gap-2 relative z-20">
-              <button
-                onClick={() => setActiveTab("leaderboard")}
-                className={`px-3 py-1.5 rounded text-xs font-medium transition-colors ${activeTab === "leaderboard" ? "bg-white/15 text-white" : "bg-white/5 text-white/50 hover:bg-white/10"}`}
-              >
-                Leaderboard
-              </button>
-              <button
-                onClick={() => setActiveTab("tournament")}
-                className={`px-3 py-1.5 rounded text-xs font-medium transition-colors ${activeTab === "tournament" ? "bg-white/15 text-white" : "bg-white/5 text-white/50 hover:bg-white/10"}`}
-              >
-                Tournaments
-              </button>
-            </div>
           </div>
         </div>
 
