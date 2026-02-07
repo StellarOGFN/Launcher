@@ -23,11 +23,11 @@ const Files: {
       fileName: "pakchunkStellar-WindowsClient.sig",
       dir: "FortniteGame\\Content\\Paks",
     },
-    // {
-    //   url: "https://cloud.arc-services.dev/modules/anticheat/Arc.exe",
-    //   fileName: "Arc.exe",
-    //   dir: "Arc",
-    // },
+    {
+      url: "https://cloud.arc-services.dev/modules/anticheat/Arc.exe",
+      fileName: "Arc.exe",
+      dir: "Arc",
+    },
     {
       url: "https://cdn.stellarfn.dev/Arc/Config.json",
       fileName: "Config.json",
