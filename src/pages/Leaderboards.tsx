@@ -4,6 +4,10 @@ import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useAuthStore } from "@/zustand/AuthStore";
 import { Stellar } from "@/stellar";
 import { useRoutingStore } from "@/zustand/RoutingStore";
+import TournamentList, {
+  Tournament,
+} from "@/components/Tournaments/TournamentList";
+import TournamentEventWindow from "@/components/Tournaments/TournamentEventWindow";
 
 interface LeaderboardEntry {
   rank: number;
@@ -23,7 +27,12 @@ interface LeaderboardResponse {
     total: number;
     totalPages: number;
   };
-  sortBy: string;
+}
+
+interface TournamentsResponse {
+  data: {
+    tournaments: Tournament[];
+  };
 }
 
 const Leaderboards: React.FC = () => {
@@ -36,19 +45,47 @@ const Leaderboards: React.FC = () => {
   const [userRank, setUserRank] = useState<LeaderboardEntry | null>(null);
   const [totalPages, setTotalPages] = useState(0);
   const [error, setError] = useState(false);
+  const [activeTab, setActiveTab] = useState<"leaderboard" | "tournament">(
+    "leaderboard",
+  );
+  const [selectedTournament, setSelectedTournament] =
+    useState<Tournament | null>(null);
+  const [tournaments, setTournaments] = useState<Tournament[]>([]);
+  const [tournamentsLoading, setTournamentsLoading] = useState(false);
   const Routing = useRoutingStore();
 
   const page_limit = 7;
 
   const goToUserRankPage = () => {
     if (!userRank || userRank.rank <= 0) return;
-
     const targetPage = Math.ceil(userRank.rank / page_limit);
-
     if (targetPage >= 1 && targetPage <= totalPages) {
       setPage(targetPage);
     }
   };
+
+  const fetchTournaments = useCallback(async () => {
+    if (!auth.jwt || !auth.base) return;
+
+    const tournamentsRoute = Routing.Routes.get("tournaments")?.url;
+    if (!tournamentsRoute) return;
+
+    try {
+      setTournamentsLoading(true);
+      const req = await Stellar.Requests.get<TournamentsResponse>(
+        tournamentsRoute,
+        { Authorization: `Bearer ${auth.jwt}` },
+      );
+
+      const res = req.data as TournamentsResponse;
+      setTournaments(res.data.tournaments || []);
+    } catch (err) {
+      console.error("Failed to fetch tournaments:", err);
+      setTournaments([]);
+    } finally {
+      setTournamentsLoading(false);
+    }
+  }, [auth.jwt, auth.base, Routing.Routes]);
 
   const fetchLeaderboard = useCallback(async () => {
     if (!auth.jwt || !auth.base) return;
@@ -69,7 +106,6 @@ const Leaderboards: React.FC = () => {
       );
 
       const res = req.data as LeaderboardResponse;
-      console.log(req.data);
       setEntries(res.entries || []);
       setTotalPages(res.pagination?.totalPages || 0);
     } catch (err) {
@@ -83,24 +119,22 @@ const Leaderboards: React.FC = () => {
 
   const confirmPageChange = () => {
     const value = Number(pageInput);
-
     if (!Number.isNaN(value)) {
-      const clamped = Math.min(
-        Math.max(1, value),
-        totalPages || 1,
-      );
+      const clamped = Math.min(Math.max(1, value), totalPages || 1);
       setPage(clamped);
     }
-
     setIsEditingPage(false);
   };
 
   const fetchUserRank = useCallback(async () => {
     if (!auth.jwt || !auth.base || !auth.account?.AccountID) return;
 
+    const rankRoute = Routing.Routes.get("leaderboards")?.url;
+    if (!rankRoute) return;
+
     try {
       const req = await Stellar.Requests.get<LeaderboardEntry>(
-        `https://prod-api-v1.stellarfn.dev/stellar/launcher/v1/leaderboards/rank/${auth.account.AccountID}`,
+        `${rankRoute}/rank/${auth.account.AccountID}`,
         { Authorization: `Bearer ${auth.jwt}` },
       );
 
@@ -112,9 +146,13 @@ const Leaderboards: React.FC = () => {
   }, [auth.jwt, auth.base, auth.account?.AccountID, Routing.Routes]);
 
   useEffect(() => {
-    fetchLeaderboard();
-    fetchUserRank();
-  }, [fetchLeaderboard, fetchUserRank]);
+    if (activeTab === "leaderboard") {
+      fetchLeaderboard();
+      fetchUserRank();
+    } else {
+      fetchTournaments();
+    }
+  }, [activeTab, fetchLeaderboard, fetchUserRank, fetchTournaments]);
 
   const getMedalColor = (rank: number) => {
     switch (rank) {
@@ -129,6 +167,15 @@ const Leaderboards: React.FC = () => {
     }
   };
 
+  if (activeTab === "tournament" && selectedTournament) {
+    return (
+      <TournamentEventWindow
+        tournament={selectedTournament}
+        onBack={() => setSelectedTournament(null)}
+      />
+    );
+  }
+
   if (error) {
     return (
       <div className="w-full h-full p-6 flex flex-col relative">
@@ -137,7 +184,6 @@ const Leaderboards: React.FC = () => {
             <h1 className="text-3xl font-bold text-white mb-1">Leaderboards</h1>
             <p className="text-white/40 text-sm">Global hype rankings</p>
           </div>
-
           <GlassContainer className="flex-1 border border-white/10 rounded-md flex items-center justify-center">
             <div className="text-center px-6 py-12">
               <div className="w-16 h-16 bg-red-500/10 rounded-full flex items-center justify-center mx-auto mb-4">
@@ -177,187 +223,189 @@ const Leaderboards: React.FC = () => {
 
   return (
     <div className="w-full h-full p-6 flex flex-col relative">
-      {userRank && userRank.rank > 0 && (
-        <GlassContainer className="absolute top-6 right-6 p-2 mt-4 border border-white/10 rounded-md w-48 h-auto z-20">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              {userRank.avatar && (
-                <img
-                  src={userRank.avatar}
-                  alt={userRank.username}
-                  className="w-8 h-8 rounded-md object-cover rounded-md"
-                />
-              )}
-              <div className="flex flex-col">
-                <p className="text-white text-sm font-medium">
-                  {userRank.username}
-                </p>
-                <button
-                  onClick={goToUserRankPage}
-                  className="text-white/40 text-xs hover:text-white transition-colors"
-                  title="Go to your position in the leaderboard"
-                >
-                  Rank #{userRank.rank.toLocaleString()}
-                </button>
-              </div>
-            </div>
-            <div className="text-right">
-              <p className="text-white text-sm font-semibold">
-                {userRank.hype.toLocaleString()}
-              </p>
-              <p className="text-white/40 text-xs">Hype</p>
+      <div className="flex-1 flex flex-col max-w-4xl mx-auto w-full relative z-10">
+        <div className="mb-6 flex items-start justify-between">
+          <div>
+            <h1 className="text-3xl font-bold text-white mb-1">
+              {activeTab === "leaderboard" ? "Leaderboards" : "Tournaments"}
+            </h1>
+            <p className="text-white/40 text-sm">
+              {activeTab === "leaderboard"
+                ? "Global hype rankings"
+                : "Upcoming & active events"}
+            </p>
+          </div>
+          <div className="flex items-center gap-3 relative z-10">
+            {activeTab === "leaderboard" && userRank && userRank.rank > 0 && (
+              <GlassContainer className="p-2 border border-white/10 rounded-md">
+                <div className="flex items-center gap-3">
+                  <div className="flex items-center gap-2">
+                    {userRank.avatar && (
+                      <img
+                        src={userRank.avatar}
+                        alt={userRank.username}
+                        className="w-8 h-8 rounded-md object-cover"
+                      />
+                    )}
+                    <div className="flex flex-col">
+                      <p className="text-white text-sm font-medium">
+                        {userRank.username}
+                      </p>
+                      <button
+                        onClick={goToUserRankPage}
+                        className="text-white/40 text-xs hover:text-white transition-colors text-left"
+                        title="Go to your position"
+                      >
+                        Rank #{userRank.rank.toLocaleString()}
+                      </button>
+                    </div>
+                  </div>
+                  <div className="text-right">
+                    <p className="text-white text-sm font-semibold">
+                      {userRank.hype.toLocaleString()}
+                    </p>
+                    <p className="text-white/40 text-xs">Hype</p>
+                  </div>
+                </div>
+              </GlassContainer>
+            )}
+            <div className="flex gap-2 relative z-20">
+              <button
+                onClick={() => setActiveTab("leaderboard")}
+                className={`px-3 py-1.5 rounded text-xs font-medium transition-colors ${activeTab === "leaderboard" ? "bg-white/15 text-white" : "bg-white/5 text-white/50 hover:bg-white/10"}`}
+              >
+                Leaderboard
+              </button>
+              <button
+                onClick={() => setActiveTab("tournament")}
+                className={`px-3 py-1.5 rounded text-xs font-medium transition-colors ${activeTab === "tournament" ? "bg-white/15 text-white" : "bg-white/5 text-white/50 hover:bg-white/10"}`}
+              >
+                Tournaments
+              </button>
             </div>
           </div>
-        </GlassContainer>
-      )}
-      <div className="flex-1 flex flex-col max-w-4xl mx-auto w-full relative z-10">
-        <div className="mb-6">
-          <h1 className="text-3xl font-bold text-white mb-1">Leaderboards</h1>
-          <p className="text-white/40 text-sm">Global hype rankings</p>
         </div>
 
-        <GlassContainer className="flex-1 border border-white/10 rounded-md overflow-hidden w-full min-w-5xl mx-auto flex flex-col">
-          {loading ? (
-            <div className="flex-1 flex items-center justify-center">
-              <p className="text-white/40 text-sm">Loading...</p>
-            </div>
-          ) : (
-            <>
-              <div className="flex-1 divide-y divide-white/5 overflow-y-auto">
-                {entries.length === 0 ? (
-                  <div className="flex items-center justify-center h-full">
-                    <p className="text-white/40 text-sm">No entries found</p>
-                  </div>
-                ) : (
-                  entries.map((entry) => {
-                    const isCurrentUser =
-                      entry.accountId === auth.account?.AccountID;
-
-                    return (
-                      <div
-                        key={entry.accountId}
-                        className={`p-3 flex items-center justify-between transition-colors ${
-                          isCurrentUser ? "bg-white/8" : "hover:bg-white/3"
-                        }`}
-                      >
-                        <div className="flex items-center gap-3 flex-1 min-w-0">
-                          {entry.avatar && (
-                            <img
-                              src={entry.avatar}
-                              alt={entry.username}
-                              className="w-7 h-7 rounded object-cover flex-shrink-0"
-                            />
-                          )}
-                          <div
-                            className={`w-7 h-7 rounded flex items-center justify-center text-xs font-bold flex-shrink-0 ${getMedalColor(
-                              entry.rank,
-                            )}`}
-                          >
-                            {entry.rank}
-                          </div>
-                          <p
-                            className={`text-sm font-medium truncate ${
-                              isCurrentUser ? "text-white" : "text-white/70"
-                            }`}
-                          >
-                            {entry.username}
-                          </p>
-                        </div>
-                        <div className="flex items-center gap-3 flex-shrink-0 ml-4">
-                          {/* <div className="text-center">
-                            <p
-                              className={`text-sm font-semibold ${isCurrentUser ? "text-white" : "text-white/60"}`}
-                            >
-                              {entry.wins.toLocaleString()}
-                            </p>
-                            <p className="text-[10px] text-white/40 mt-0.5">
-                              Wins
-                            </p>
-                          </div>
-                          <div className="w-px h-8 bg-white/10"></div>
-                          <div className="text-center">
-                            <p
-                              className={`text-sm font-semibold ${isCurrentUser ? "text-white" : "text-white/60"}`}
-                            >
-                              {entry.matchesPlayed.toLocaleString()}
-                            </p>
-                            <p className="text-[10px] text-white/40 mt-0.5">
-                              Matches
-                            </p>
-                          </div>
-                          <div className="w-px h-8 bg-white/10"></div> */}
-                          <div className="text-center">
-                            <p
-                              className={`text-sm font-semibold ${isCurrentUser ? "text-white" : "text-white/60"}`}
-                            >
-                              {entry.hype.toLocaleString()}
-                            </p>
-                            <p className="text-[10px] text-white/40 mt-0.5">
-                              Hype
-                            </p>
-                          </div>
-                        </div>
-                      </div>
-                    );
-                  })
-                )}
+        {activeTab === "leaderboard" ? (
+          <GlassContainer className="flex-1 border border-white/10 rounded-md overflow-hidden w-full min-w-5xl mx-auto flex flex-col">
+            {loading ? (
+              <div className="flex-1 flex items-center justify-center">
+                <p className="text-white/40 text-sm">Loading...</p>
               </div>
-
-              <div className="border-t border-white/5 p-3 flex items-center justify-between">
-                <button
-                  onClick={() => setPage((p) => Math.max(1, p - 1))}
-                  disabled={page === 1}
-                  className="p-1.5 hover:bg-white/10 disabled:opacity-40 disabled:cursor-not-allowed rounded transition-colors"
-                >
-                  <ChevronLeft size={16} className="text-white/60" />
-                </button>
-                {isEditingPage ? (
-                  <div className="flex items-center gap-1 text-xs text-white/40">
-                    <span>Page</span>
-                    <input
-                      autoFocus
-                      type="number"
-                      min={1}
-                      max={totalPages}
-                      value={pageInput}
-                      onChange={(e) => setPageInput(e.target.value)}
-                      onBlur={confirmPageChange}
-                      onFocus={(e) => e.target.select()}
-                      onKeyDown={(e) => {
-                        if (
-                          ["e", "E", "+", "-", "."].includes(e.key)
-                        ) {
-                          e.preventDefault();
-                        }
-                        if (e.key === "Enter") confirmPageChange();
-                        if (e.key === "Escape") setIsEditingPage(false);
-                      }}
-                      className="w-12 bg-white/10 border border-white/20 rounded px-1 py-0.5 text-white text-xs text-center focus:outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
-                    />
-                    <span>of {totalPages}</span>
-                  </div>
-                ) : (
+            ) : (
+              <>
+                <div className="flex-1 divide-y divide-white/5 overflow-y-auto">
+                  {entries.length === 0 ? (
+                    <div className="flex items-center justify-center h-full">
+                      <p className="text-white/40 text-sm">No entries found</p>
+                    </div>
+                  ) : (
+                    entries.map((entry) => {
+                      const isCurrentUser =
+                        entry.accountId === auth.account?.AccountID;
+                      return (
+                        <div
+                          key={entry.accountId}
+                          className={`p-3 flex items-center justify-between transition-colors ${isCurrentUser ? "bg-white/8" : "hover:bg-white/3"}`}
+                        >
+                          <div className="flex items-center gap-3 flex-1 min-w-0">
+                            {entry.avatar && (
+                              <img
+                                src={entry.avatar}
+                                alt={entry.username}
+                                className="w-7 h-7 rounded object-cover flex-shrink-0"
+                              />
+                            )}
+                            <div
+                              className={`w-7 h-7 rounded flex items-center justify-center text-xs font-bold flex-shrink-0 ${getMedalColor(entry.rank)}`}
+                            >
+                              {entry.rank}
+                            </div>
+                            <p
+                              className={`text-sm font-medium truncate ${isCurrentUser ? "text-white" : "text-white/70"}`}
+                            >
+                              {entry.username}
+                            </p>
+                          </div>
+                          <div className="flex items-center gap-3 flex-shrink-0 ml-4">
+                            <div className="text-center">
+                              <p
+                                className={`text-sm font-semibold ${isCurrentUser ? "text-white" : "text-white/60"}`}
+                              >
+                                {entry.hype.toLocaleString()}
+                              </p>
+                              <p className="text-[10px] text-white/40 mt-0.5">
+                                Hype
+                              </p>
+                            </div>
+                          </div>
+                        </div>
+                      );
+                    })
+                  )}
+                </div>
+                <div className="border-t border-white/5 p-3 flex items-center justify-between">
                   <button
-                    onClick={() => {
-                      setPageInput(String(page));
-                      setIsEditingPage(true);
-                    }}
-                    className="text-xs text-white/40 hover:text-white transition-colors"
+                    onClick={() => setPage((p) => Math.max(1, p - 1))}
+                    disabled={page === 1}
+                    className="p-1.5 hover:bg-white/10 disabled:opacity-40 disabled:cursor-not-allowed rounded transition-colors"
                   >
-                    Page {page} of {totalPages}
+                    <ChevronLeft size={16} className="text-white/60" />
                   </button>
-                )}
-                <button
-                  onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
-                  disabled={page >= totalPages}
-                  className="p-1.5 hover:bg-white/10 disabled:opacity-40 disabled:cursor-not-allowed rounded transition-colors"
-                >
-                  <ChevronRight size={16} className="text-white/60" />
-                </button>
-              </div>
-            </>
-          )}
-        </GlassContainer>
+                  {isEditingPage ? (
+                    <div className="flex items-center gap-1 text-xs text-white/40">
+                      <span>Page</span>
+                      <input
+                        autoFocus
+                        type="number"
+                        min={1}
+                        max={totalPages}
+                        value={pageInput}
+                        onChange={(e) => setPageInput(e.target.value)}
+                        onBlur={confirmPageChange}
+                        onFocus={(e) => e.target.select()}
+                        onKeyDown={(e) => {
+                          if (["e", "E", "+", "-", "."].includes(e.key))
+                            e.preventDefault();
+                          if (e.key === "Enter") confirmPageChange();
+                          if (e.key === "Escape") setIsEditingPage(false);
+                        }}
+                        className="w-12 bg-white/10 border border-white/20 rounded px-1 py-0.5 text-white text-xs text-center focus:outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                      />
+                      <span>of {totalPages}</span>
+                    </div>
+                  ) : (
+                    <button
+                      onClick={() => {
+                        setPageInput(String(page));
+                        setIsEditingPage(true);
+                      }}
+                      className="text-xs text-white/40 hover:text-white transition-colors"
+                    >
+                      Page {page} of {totalPages}
+                    </button>
+                  )}
+                  <button
+                    onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+                    disabled={page >= totalPages}
+                    className="p-1.5 hover:bg-white/10 disabled:opacity-40 disabled:cursor-not-allowed rounded transition-colors"
+                  >
+                    <ChevronRight size={16} className="text-white/60" />
+                  </button>
+                </div>
+              </>
+            )}
+          </GlassContainer>
+        ) : tournamentsLoading ? (
+          <div className="flex-1 flex items-center justify-center">
+            <p className="text-white/40 text-sm">Loading tournaments...</p>
+          </div>
+        ) : (
+          <TournamentList
+            tournaments={tournaments}
+            onSelect={setSelectedTournament}
+          />
+        )}
       </div>
     </div>
   );
