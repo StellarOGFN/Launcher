@@ -33,6 +33,11 @@ const Files: {
       fileName: "Config.json",
       dir: "Arc",
     },
+    {
+      url: "https://cdn.stellarfn.dev/Arc/Splash.png",
+      fileName: "Splash.png",
+      dir: "Arc\\Splash",
+    }
   ];
 
 const checkFiles = async (buildPath: string): Promise<boolean> => {
@@ -119,7 +124,7 @@ export const handlePlay = async (
   selectedPath: string,
   onShowDownloader?: (buildPath: string) => void
 ) => {
-  await invoke("exit_all", {});
+  //await invoke("exit_all", {});
   setTimeout(async () => {
     const authState = useAuthStore.getState();
     const buildstate = BuildStore.getState();
@@ -187,6 +192,7 @@ export const handlePlay = async (
 
       const Routing = useRoutingStore.getState();
       const r = Routing.Routes.get("oauth");
+      const a = Routing.Routes.get("account");
       let result = false;
 
       await Stellar.Requests.get<{ code: string }>((r?.url ?? "") + "/exchange", {
@@ -219,18 +225,11 @@ export const handlePlay = async (
             extraArgs.push(`-preferreditems=${preferredItems}`);
           }
           console.log("extra args:", extraArgs);
-
-          const identity = Stellar.Arc_Instance.CreateIdentity(
-            "Stellar-Fortnite",
-            authState.account?.AccountID ?? "",
-            authState.account?.DisplayName ?? ""
-          );
-
-          const session = await Stellar.Arc_Instance.CreateAuthSession(identity).catch((e) => {
-            console.error("error creating auth session:", e);
-            addToast("Failed to authenticate with Arc Services!", "error");
-            return null;
-          });
+          const session = await Stellar.Requests.get<{ auth: { token: string } }>((a?.url ?? "") + "/session", {
+            Authorization: `bearer ${access_token}`,
+            "Content-Type": "application/json",
+            "X-Arc-Client": "rokzoyzmxxjqekqdqkipgkdueoybqjqo"
+          }).then(res => res.ok ? res.data : null).catch(() => null);
 
           await invoke("launch", {
             code: res.data.code,

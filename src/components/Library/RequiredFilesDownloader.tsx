@@ -30,6 +30,11 @@ const Files: {
     fileName: "Config.json",
     dir: "Arc",
   },
+  {
+    url: "https://cdn.stellarfn.dev/Arc/Splash.png",
+    fileName: "Splash.png",
+    dir: "Arc\\Splash",
+  },
 ];
 
 interface DownloadProgress {
