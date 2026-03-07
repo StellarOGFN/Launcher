@@ -124,7 +124,7 @@ export const handlePlay = async (
   selectedPath: string,
   onShowDownloader?: (buildPath: string) => void
 ) => {
-  //await invoke("exit_all", {});
+  await invoke("exit_all", {});
   setTimeout(async () => {
     const authState = useAuthStore.getState();
     const buildstate = BuildStore.getState();
