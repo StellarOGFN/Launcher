@@ -11,6 +11,8 @@ import Settings from "./pages/Settings";
 import { useToastStore } from "./zustand/ToastStore";
 import { ToastContainer } from "./components/Global/Toast";
 import Leaderboards from "./pages/Leaderboards";
+import { useThemeStore } from "./zustand/ThemeStore";
+import { useEffect } from "react";
 
 const root = ReactDOM.createRoot(
   document.getElementById("root") as HTMLElement,
@@ -19,6 +21,11 @@ const root = ReactDOM.createRoot(
 const App = () => {
   const location = useLocation();
   const { toasts, removeToast } = useToastStore();
+  const { theme, applyTheme } = useThemeStore();
+
+  useEffect(() => {
+    applyTheme(theme);
+  }, []);
 
   return (
     <>

@@ -13,32 +13,42 @@ const Files: {
   fileName: string;
   dir?: string;
 }[] = [
-    {
-      url: "https://cdn.stellarfn.dev/Paks/pakchunkStellar-WindowsClient.pak",
-      fileName: "pakchunkStellar-WindowsClient.pak",
-      dir: "FortniteGame\\Content\\Paks",
-    },
-    {
-      url: "https://cdn.stellarfn.dev/Paks/pakchunkStellar-WindowsClient.sig",
-      fileName: "pakchunkStellar-WindowsClient.sig",
-      dir: "FortniteGame\\Content\\Paks",
-    },
-    {
-      url: "https://cloud.arc-services.dev/modules/anticheat/Arc.exe",
-      fileName: "Arc.exe",
-      dir: "Arc",
-    },
-    {
-      url: "https://cdn.stellarfn.dev/Arc/Config.json",
-      fileName: "Config.json",
-      dir: "Arc",
-    },
-    {
-      url: "https://cdn.stellarfn.dev/Arc/Splash.png",
-      fileName: "Splash.png",
-      dir: "Arc\\Splash",
-    }
-  ];
+  {
+    url: "https://cdn.stellarfn.dev/Paks/pakchunkStellar-WindowsClient.pak",
+    fileName: "pakchunkStellar-WindowsClient.pak",
+    dir: "FortniteGame\\Content\\Paks",
+  },
+  {
+    url: "https://cdn.stellarfn.dev/Paks/pakchunkStellar-WindowsClient.sig",
+    fileName: "pakchunkStellar-WindowsClient.sig",
+    dir: "FortniteGame\\Content\\Paks",
+  },
+  {
+    url: "https://cdn.stellarfn.dev/Paks/pakchunkStellar_s1-WindowsClient.pak",
+    fileName: "pakchunkStellar_s1-WindowsClient.pak",
+    dir: "FortniteGame\\Content\\Paks",
+  },
+  {
+    url: "https://cdn.stellarfn.dev/Paks/pakchunkStellar_s1-WindowsClient.sig",
+    fileName: "pakchunkStellar_s1-WindowsClient.sig",
+    dir: "FortniteGame\\Content\\Paks",
+  },
+  {
+    url: "https://cloud.arc-services.dev/modules/anticheat/Arc.exe",
+    fileName: "Arc.exe",
+    dir: "Arc",
+  },
+  {
+    url: "https://cdn.stellarfn.dev/Arc/Config.json",
+    fileName: "Config.json",
+    dir: "Arc",
+  },
+  {
+    url: "https://cdn.stellarfn.dev/Arc/Splash.png",
+    fileName: "Splash.png",
+    dir: "Arc\\Splash",
+  },
+];
 
 const checkFiles = async (buildPath: string): Promise<boolean> => {
   try {
@@ -54,36 +64,34 @@ const checkFiles = async (buildPath: string): Promise<boolean> => {
           url: "https://cdn.stellarfn.dev/Paks/pakchunkBubbleWrap-WindowsClient_P.sig",
           fileName: "pakchunkStellarBubble-WindowsClient.sig",
           dir: "FortniteGame\\Content\\Paks",
-        }
+        },
       );
-    }
-    else {
+    } else {
       const pakPath = await join(
         buildPath,
         "FortniteGame\\Content\\Paks",
-        "pakchunkStellarBubble-WindowsClient.pak"
+        "pakchunkStellarBubble-WindowsClient.pak",
       );
 
       const sigPath = await join(
         buildPath,
         "FortniteGame\\Content\\Paks",
-        "pakchunkStellarBubble-WindowsClient.sig"
+        "pakchunkStellarBubble-WindowsClient.sig",
       );
 
       if (await invoke("check_file_exists", { path: pakPath })) {
-        await invoke("delete_file", { path: pakPath }).catch(() => { });
+        await invoke("delete_file", { path: pakPath }).catch(() => {});
       }
 
       if (await invoke("check_file_exists", { path: sigPath })) {
-        await invoke("delete_file", { path: sigPath }).catch(() => { });
+        await invoke("delete_file", { path: sigPath }).catch(() => {});
       }
     }
-
 
     for (const file of Files) {
       const directory = await join(
         buildPath,
-        file.dir || "FortniteGame\\Content\\Paks"
+        file.dir || "FortniteGame\\Content\\Paks",
       );
       const filePath = await join(directory, file.fileName);
 
@@ -122,7 +130,7 @@ let isLaunching = false; // ts so scuff
 
 export const handlePlay = async (
   selectedPath: string,
-  onShowDownloader?: (buildPath: string) => void
+  onShowDownloader?: (buildPath: string) => void,
 ) => {
   await invoke("exit_all", {});
   setTimeout(async () => {
@@ -130,8 +138,7 @@ export const handlePlay = async (
     const buildstate = BuildStore.getState();
     const { addToast } = useToastStore.getState();
 
-    if (isLaunching)
-      return false;
+    if (isLaunching) return false;
 
     isLaunching = true;
 
@@ -161,11 +168,11 @@ export const handlePlay = async (
       "FortniteGame",
       "Binaries",
       "Win64",
-      "FortniteClient-Win64-Shipping.exe"
+      "FortniteClient-Win64-Shipping.exe",
     );
 
     const exists = (await invoke("check_file_exists", { path: exe }).catch(
-      () => false
+      () => false,
     )) as boolean;
     if (!exists) {
       addToast("Build does not exist / is corrupted!", "error");
@@ -195,9 +202,12 @@ export const handlePlay = async (
       const a = Routing.Routes.get("account");
       let result = false;
 
-      await Stellar.Requests.get<{ code: string }>((r?.url ?? "") + "/exchange", {
-        Authorization: `bearer ${access_token}`,
-      }).then(async (res) => {
+      await Stellar.Requests.get<{ code: string }>(
+        (r?.url ?? "") + "/exchange",
+        {
+          Authorization: `bearer ${access_token}`,
+        },
+      ).then(async (res) => {
         if (res.ok) {
           result = true;
 
@@ -213,8 +223,11 @@ export const handlePlay = async (
           console.log("authenticated with server, launching...");
           let extraArgs: string[] = [];
           const preEdits = Stellar.Storage.get<boolean>("game.disablePreEdits");
-          const resetOnRelease = Stellar.Storage.get<boolean>("game.resetOnRelease");
-          const preferredItems = Stellar.Storage.get<string>("game.preferredItemsCmd") || [];
+          const resetOnRelease = Stellar.Storage.get<boolean>(
+            "game.resetOnRelease",
+          );
+          const preferredItems =
+            Stellar.Storage.get<string>("game.preferredItemsCmd") || [];
           if (preEdits) {
             extraArgs.push("-dpe");
           }
@@ -225,17 +238,21 @@ export const handlePlay = async (
             extraArgs.push(`-preferreditems=${preferredItems}`);
           }
           console.log("extra args:", extraArgs);
-          const session = await Stellar.Requests.get<{ auth: { token: string } }>((a?.url ?? "") + "/session", {
+          const session = await Stellar.Requests.get<{
+            auth: { token: string };
+          }>((a?.url ?? "") + "/session", {
             Authorization: `bearer ${access_token}`,
             "Content-Type": "application/json",
-            "X-Arc-Client": "rokzoyzmxxjqekqdqkipgkdueoybqjqo"
-          }).then(res => res.ok ? res.data : null).catch(() => null);
+            "X-Arc-Client": "rokzoyzmxxjqekqdqkipgkdueoybqjqo",
+          })
+            .then((res) => (res.ok ? res.data : null))
+            .catch(() => null);
 
           await invoke("launch", {
             code: res.data.code,
             path: path,
             extraArgs,
-            identity: session?.auth.token
+            identity: session?.auth.token,
           });
 
           window.getCurrentWindow().minimize();

@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
 import { motion } from "framer-motion";
-import { Wrench, Gamepad } from "lucide-react";
+import { Wrench, Gamepad, Palette } from "lucide-react";
 import GlassContainer from "../Global/GlassContainer";
 import { useAuthStore } from "@/zustand/AuthStore";
 
@@ -11,6 +11,7 @@ export const SettingsTopBar: React.FC<{
   const AuthStore = useAuthStore();
   const sections = [
     { name: "Game Options", icon: <Gamepad size={15} /> },
+    { name: "Customization", icon: <Palette size={15} /> },
     // { name: "Options", icon: <Settings size={15} /> },
   ];
 

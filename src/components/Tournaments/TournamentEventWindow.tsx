@@ -121,10 +121,6 @@ const getWindowId = (window: TournamentWindow): string => {
   return window.eventWindowId || window.WindowId || "";
 };
 
-const getWindowRound = (window: TournamentWindow): number => {
-  return window.round ?? window.Round ?? 1;
-};
-
 const getWindowStart = (window: TournamentWindow): string => {
   return window.beginTime || window.Start || "";
 };
@@ -161,13 +157,6 @@ const formatWindowTime = (start: string, end: string): string => {
     });
 
   return `${formatTime(startDate)} - ${formatTime(endDate)}`;
-};
-
-const getActualValue = (obj: PayoutReward, key: string): any => {
-  const lowerKey = key.toLowerCase();
-  const upperKey = key.charAt(0).toUpperCase() + key.slice(1);
-
-  return obj[lowerKey] ?? obj[upperKey];
 };
 
 const formatScoringRules = (rules: ScoringRule[]): FormattedScoringRule[] => {

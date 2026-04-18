@@ -6,6 +6,7 @@ import { GameOptionsPage } from "@/components/Settings/pages/GameOptionsPage";
 import { OptionsPage } from "@/components/Settings/pages/OptionsPage";
 import { DeveloperPage } from "@/components/Settings/pages/DeveloperPage";
 import GlassContainer from "@/components/Global/GlassContainer";
+import { ThemePage } from "@/components/Settings/pages/ThemePage";
 
 const Settings: React.FC = () => {
   const [view, setView] = useState("Game");
@@ -18,6 +19,8 @@ const Settings: React.FC = () => {
         return <OptionsPage />;
       case "Developer":
         return <DeveloperPage />;
+      case "Customization":
+        return <ThemePage />;
       default:
         return <GameOptionsPage />;
     }

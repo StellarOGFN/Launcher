@@ -17,13 +17,18 @@ body,
 body {
   width: 100vw;
   height: 100vh;
-  background: radial-gradient(
+  background:
+    radial-gradient(
       circle at 20% 50%,
       rgba(114, 113, 223, 0.3),
       transparent 50%
     ),
     radial-gradient(circle at 80% 80%, rgba(145, 52, 69, 0.3), transparent 50%),
-    radial-gradient(circle at 40% 20%, rgba(10, 114, 158, 0.2), transparent 50%),
+    radial-gradient(
+      circle at 40% 20%,
+      rgba(10, 114, 158, 0.2),
+      transparent 50%
+    ),
     linear-gradient(135deg, #0f0f1a, #0f0f31);
   background-attachment: fixed;
   overflow-x: hidden;
